@@ -2,31 +2,122 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_bootstrap_components as dbc
+import plotly.express as px
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+import pandas as pd
 
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+import json
 
-app.layout = html.Div(children=[
-    html.H1(children='Hello Dash'),
+surv_df = pd.read_csv('ceidg_data_surv.csv')
+surv_df.loc[:, 'YearOfStartingOfTheBusiness'] = pd.to_datetime(surv_df['YearOfStartingOfTheBusiness'], format='%Y')
+surv_df.loc[:, 'DateOfStartingOfTheBusiness'] = pd.to_datetime(surv_df['DateOfStartingOfTheBusiness'], format='%Y-%m-%d')
+surv_df.loc[:, 'DateOfTermination'] = pd.to_datetime(surv_df['DateOfTermination'], format='%Y-%m-%d')
 
-    html.Div(children='''
-        Dash: A web application framework for Python.
-    '''),
+surv_removed_df = surv_df[surv_df['Terminated'] == 1]
 
-    dcc.Graph(
-        id='example-graph',
-        figure={
-            'data': [
-                {'x': [1, 2, 3, 4], 'y': [4, 1, 2, 3], 'type': 'bar', 'name': 'SF'},
-                {'x': [1, 2, 3, 4], 'y': [2, 4, 5, 7], 'type': 'bar', 'name': u'Montréal'},
-            ],
-            'layout': {
-                'title': 'Dash Data Visualization'
-            }
-        }
-    )
+surv_removed_df.loc[:, 'YearOfTermination'] = surv_removed_df['DateOfTermination'].dt.year
+
+polish_voivodeship = [
+    'dolnośląskie',
+    'kujawsko-pomorskie',
+    'lubelskie',
+    'lubuskie',
+    'łódzkie',
+    'małopolskie',
+    'mazowieckie',
+    'opolskie',
+    'podkarpackie',
+    'podlaskie',
+    'pomorskie',
+    'śląskie',
+    'świętokrzyskie',
+    'warmińsko-mazurskie',
+    'wielkopolskie',
+    'zachodniopomorskie'
+]
+surv_removed_df['MainAddressVoivodeship'] = surv_removed_df.MainAddressVoivodeship.str.lower()
+surv_removed_df = surv_removed_df[surv_removed_df.MainAddressVoivodeship.isin(polish_voivodeship)]
+
+# TIMELINE DATA
+timeline_mock_df = surv_removed_df[(surv_removed_df['MainAddressVoivodeship'] == 'mazowieckie') & (surv_removed_df['PKDMainSection'] == 'G')]
+
+timeline_mock_df = pd.DataFrame({'count': timeline_mock_df.groupby("YearOfTermination").size()}).reset_index()
+
+
+#MAP
+with open('assets/wojewodztwa-medium.geojson') as woj_json:
+    wojewodztwa_geo = json.load(woj_json)
+
+mock_map_df = pd.DataFrame(
+    {
+        'woj_id': [i for i in range(16)],
+        'mock_val': [i for i in range(16)]
+    }
+)
+fig = px.choropleth_mapbox(mock_map_df, geojson=wojewodztwa_geo,
+                           locations='woj_id', color='mock_val',
+                           zoom=5, center={"lat": 52.10, "lon": 19.42},
+                           opacity=0.5,
+                           labels={'mock_val': 'mocked value'},
+                           title='Map title'
+                           )
+fig.update_layout(mapbox_style="white-bg")
+fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+
+
+app = dash.Dash(__name__, external_stylesheets=[
+    dbc.themes.BOOTSTRAP,
+    './first-tab.css'
 ])
+
+app.layout = html.Div(
+    className='main-wrapper',
+    children=html.Div(
+        className='section',
+        children=[
+            dbc.Row(
+                className='top',
+                no_gutters=True,
+                children=[
+                    dbc.Col(md=8,
+                            children=dcc.Graph(
+                                className='fill-height',
+                                figure=fig
+                            )
+                            ),
+                    dbc.Col(md=4,
+                            children=html.Div("TreeMap")
+                            ),
+
+                ]),
+            dbc.Row(
+                className='bottom',
+                no_gutters=True,
+                children=[
+                    dbc.Col(md=8,
+                            className='fill-height',
+                            children=dcc.Graph(
+                                    className='fill-height',
+                                    id='timeline',
+                                    responsive=False,
+                                    figure={
+                                        'data': [dict(
+                                            x=timeline_mock_df['YearOfTermination'],
+                                            y=timeline_mock_df['count']
+                                        )]
+                                    }
+                                )
+                            ),
+                    dbc.Col(md=4,
+                            children=html.Div("TEXT")
+                            ),
+
+                ])
+        ]
+    )
+)
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
