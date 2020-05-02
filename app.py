@@ -33,7 +33,7 @@ app.layout = html.Div(children=[
     dcc.Dropdown(
         id='business-type',
         options=BUISSNES_MAPPING,
-        value='sklep',
+        value='Q_86',
 	style=dict(
             width=200,
 	    display='inline-block',
@@ -45,7 +45,7 @@ app.layout = html.Div(children=[
     dcc.Dropdown(
         id='voivodeship',
         options=VOIVODESHIPS_MAPPING,
-        value='sklep',
+        value='mazowieckie',
 	style=dict(
             width=170,
 	    display='inline-block',
@@ -64,7 +64,7 @@ app.layout = html.Div(children=[
 		    {'label': 'licencje', 'value': 1},
 		    {'label': 'nie mam licencji', 'value': 0},
 		],
-		value='0',
+		value=0,
 		style=dict(
 		    width=135,
 		    display='inline-block',
@@ -84,7 +84,7 @@ app.layout = html.Div(children=[
             {'label': 'Posiadam udziały', 'value': 1},
             {'label': 'Nie posiadam udziałów', 'value': 0},
         ],
-        value='Janusz',
+        value=0,
 	style=dict(
             width=185,
 	    display='inline-block',
@@ -146,7 +146,7 @@ def predict(PKD_Div_Sec, voivodeship, licence, shareholder, email, phone_number)
 def plot_proba(PKD_Div_Sec, voivodeship, licence, shareholder, email, phone_number):
     return  {
             'data': [
-                {'x': [1, 2, 3], 'y': [int(licence), 4, 2], 'type': 'bar'},
+                {'x': [1, 2, 3], 'y': [licence, 4, 2], 'type': 'bar'},
             ],
             'layout': {
                 'title': 'Prawdopodobienstwo updaku firmy w przedzialach miesiecznych'
