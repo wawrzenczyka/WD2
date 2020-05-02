@@ -102,6 +102,10 @@ app.layout = html.Div(children=[
     
     html.Plaintext("Twoja firma przetrwa:", style=dict(display='block')),
     dcc.Input(id="output", type="text", placeholder=""),
+
+
+    dcc.Graph(id='bankrupcy_proba-graph')
+
 ])
 
 @app.callback(
@@ -128,6 +132,26 @@ def predict(PKD_Div_Sec, voivodeship, licence, shareholder, email, phone_number)
     for x in [PKD_Div_Sec, voivodeship, licence, shareholder, email, phone_number]:
         txt += str(x)
     return txt
+
+
+@app.callback(
+   Output(component_id='bankrupcy_proba-graph', component_property='figure'),
+   [Input(component_id='business-type', component_property='value'),
+    Input(component_id='voivodeship', component_property='value'),
+    Input(component_id='is_licence', component_property='value'),
+    Input(component_id='is_shareholder', component_property='value'),
+    Input(component_id='email', component_property='value'),
+    Input(component_id='phone_number', component_property='value')]
+   )
+def plot_proba(PKD_Div_Sec, voivodeship, licence, shareholder, email, phone_number):
+    return  {
+            'data': [
+                {'x': [1, 2, 3], 'y': [int(licence), 4, 2], 'type': 'bar'},
+            ],
+            'layout': {
+                'title': 'Prawdopodobienstwo updaku firmy w przedzialach miesiecznych'
+            }
+        }
 
 if __name__ == '__main__':
     app.run_server(debug=True)
