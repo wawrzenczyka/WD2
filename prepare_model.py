@@ -4,6 +4,8 @@ import numpy as np
 df = pd.read_csv("ceidg_data_surv.csv")
 
 #%% add TerminationPeriod column
+df = df.drop(df.loc[df.Status == "Aktywny"].index)
+
 df.loc[df.DurationOfExistenceInMonths < 12, "TerminationPeriod"] = 0
 df.loc[np.logical_and(df.DurationOfExistenceInMonths >= 12, df.DurationOfExistenceInMonths < 24), "TerminationPeriod"] = 1
 df.loc[np.logical_and(df.DurationOfExistenceInMonths >= 24, df.DurationOfExistenceInMonths < 36), "TerminationPeriod"] = 2
@@ -13,8 +15,6 @@ df.loc[np.logical_and(df.DurationOfExistenceInMonths >= 60, df.DurationOfExisten
 df.loc[np.logical_and(df.DurationOfExistenceInMonths >= 72, df.DurationOfExistenceInMonths < 84), "TerminationPeriod"] = 6
 df.loc[np.logical_and(df.DurationOfExistenceInMonths >= 84, df.DurationOfExistenceInMonths < 96), "TerminationPeriod"] = 7
 df.loc[df.DurationOfExistenceInMonths >= 96, "TerminationPeriod"] = 8
-
-df = df.drop(df.loc[df.TerminationPeriod == 8].index)
 
 #%% fix voivodeships
 import unicodedata

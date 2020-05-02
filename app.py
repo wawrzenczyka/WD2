@@ -14,9 +14,8 @@ BUISSNES_MAPPING = [
 	{'label': 'kasyno', 'value': 'R_92'},
 	{'label': 'statek', 'value': 'H_50'},
 	{'label': 'firmę opikuńczą', 'value': 'Q_88'},
-    {'label': 'sdf asdf', 'value': 'F_43'},
 ]
-LICENCED_BUISSNES = ['Q_86', 'M_69', 'R_92', 'H_50', 'Q_88', 'F_43']
+LICENCED_BUISSNES = ['Q_86', 'M_69', 'R_92', 'H_50', 'Q_88']
 
 SEX_MAPPING = [
 	{'label': 'kobietą', 'value': 'F'},
@@ -156,7 +155,6 @@ def predict(sex, PKD_Div_Sec, voivodeship, licence, shareholder, email, phone_nu
         'ShareholderInOtherCompanies': [shareholder>0], 'IsPhoneNo': [phone_number != ""], \
         'IsEmail': [email != ""], 'Sex': [sex]}
     pred = int(clf.predict(pd.DataFrame(X).astype(str))[0])
-    print(pred)
     return {
         0: "mniej niż rok",
         1: "niecałe 2 lata",
@@ -166,6 +164,7 @@ def predict(sex, PKD_Div_Sec, voivodeship, licence, shareholder, email, phone_nu
         5: "ponad 5 lat",
         6: "ponad 6 lat",
         7: "ponad 7 lat",
+        8: "ponad 8 lat",
     }.get(pred, "4-5 lat")
 
 @app.callback(
@@ -185,11 +184,9 @@ def plot_proba(sex, PKD_Div_Sec, voivodeship, licence, shareholder, email, phone
         'IsEmail': [email != ""], 'Sex': [sex]}
 
     proba = clf.predict_proba(pd.DataFrame(X).astype(str))[0]
-    print(pd.DataFrame(X).astype(str))
-    print(proba)
     return  {
             'data': [
-                {'x': ['0-11','12-23', '24-35', '36-47','48-59','60-71','72-83','84-95'], 'y': proba, 'type': 'bar'},
+                {'x': ['0-11','12-23', '24-35', '36-47','48-59','60-71','72-83','84-95', '96+'], 'y': proba, 'type': 'bar'},
             ],
             'layout': {
                 'title': 'Prawdopodobienstwo updaku firmy w przedzialach miesiecznych'
