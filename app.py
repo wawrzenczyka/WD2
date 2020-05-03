@@ -23,17 +23,40 @@ timeline_mock_df = pd.DataFrame({'count': timeline_mock_df.groupby("YearOfTermin
 with open('assets/wojewodztwa-medium.geojson') as woj_json:
     wojewodztwa_geo = json.load(woj_json)
 
+woj_ids = {
+    0: 'śląskie',
+    1: 'opolskie',
+    2: 'wielkopolskie',
+    3: 'zachodniopomorskie',
+    4: 'świętokrzyskie',
+    5: 'kujawsko-pomorskie',
+    6: 'podlaskie',
+    7: 'dolnośląskie',
+    8: 'podkarpackie',
+    9: 'małopolskie',
+    10: 'pomorskie',
+    11: 'warmińsko-mazurskie',
+    12: 'łódźkie',
+    13: 'mazowieckie',
+    14: 'lubelskie',
+    15: 'lubuskie'
+}
+woj_df = pd.DataFrame({
+    'id': list(woj_ids.keys()),
+    'voivode': list(woj_ids.values())
+})
+
 mock_map_df = pd.DataFrame(
     {
         'woj_id': [i for i in range(16)],
         'mock_val': [i for i in range(16)]
     }
 )
-fig = px.choropleth_mapbox(mock_map_df, geojson=wojewodztwa_geo,
-                           locations='woj_id', color='mock_val',
-                           zoom=5, center={"lat": 52.10, "lon": 19.42},
+fig = px.choropleth_mapbox(woj_df, geojson=wojewodztwa_geo,
+                           locations='id', color='id',
+                           zoom=5.5, center={"lat": 52.10, "lon": 19.42},
                            opacity=0.5,
-                           labels={'mock_val': 'mocked value'},
+                           hover_name='voivode',
                            title='Map title'
                            )
 fig.update_layout(mapbox_style="white-bg")
