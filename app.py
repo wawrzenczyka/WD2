@@ -3,6 +3,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
 import json
@@ -24,22 +25,22 @@ with open('assets/wojewodztwa-medium.geojson') as woj_json:
     wojewodztwa_geo = json.load(woj_json)
 
 woj_ids = {
-    0: 'śląskie',
-    1: 'opolskie',
-    2: 'wielkopolskie',
-    3: 'zachodniopomorskie',
-    4: 'świętokrzyskie',
-    5: 'kujawsko-pomorskie',
-    6: 'podlaskie',
-    7: 'dolnośląskie',
-    8: 'podkarpackie',
-    9: 'małopolskie',
-    10: 'pomorskie',
-    11: 'warmińsko-mazurskie',
-    12: 'łódźkie',
-    13: 'mazowieckie',
-    14: 'lubelskie',
-    15: 'lubuskie'
+    'śląskie': 0,
+    'opolskie': 1,
+    'wielkopolskie': 2,
+    'zachodniopomorskie': 3,
+    'świętokrzyskie': 4,
+    'kujawsko-pomorskie': 5,
+    'podlaskie': 6,
+    'dolnośląskie': 7,
+    'podkarpackie': 8,
+    'małopolskie': 9,
+    'pomorskie': 10,
+    'warmińsko-mazurskie': 11,
+    'łódzkie': 12,
+    'mazowieckie': 13,
+    'lubelskie': 14,
+    'lubuskie':15
 }
 woj_df = pd.DataFrame({
     'id': list(woj_ids.keys()),
@@ -52,15 +53,6 @@ mock_map_df = pd.DataFrame(
         'mock_val': [i for i in range(16)]
     }
 )
-fig = px.choropleth_mapbox(woj_df, geojson=wojewodztwa_geo,
-                           locations='id', color='id',
-                           zoom=5.5, center={"lat": 52.10, "lon": 19.42},
-                           opacity=0.5,
-                           hover_name='voivode',
-                           title='Map title'
-                           )
-fig.update_layout(mapbox_style="white-bg")
-fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 
 
 app = dash.Dash(__name__, external_stylesheets=[
@@ -80,6 +72,7 @@ app.layout = html.Div(
                             ),
                     dbc.Col(md=11,
                             children=dcc.Slider(
+                                    id='year-slider',
                                     min=2011,
                                     max=2020,
                                     step=1,
@@ -95,8 +88,8 @@ app.layout = html.Div(
                 children=[
                     dbc.Col(md=8,
                             children=dcc.Graph(
-                                    className='fill-height',
-                                    figure=fig
+                                    id='map',
+                                    className='fill-height'
                                 )
                             ),
                     dbc.Col(md=4,
@@ -129,6 +122,30 @@ app.layout = html.Div(
         ]
     )
 )
+
+
+@app.callback(
+    Output('map', 'figure'),
+    [Input('year-slider', 'value')])
+def update_map(year):
+    filtered_df = surv_df[(surv_df['YearOfTermination'] <= year) | pd.isna(surv_df['YearOfTermination'])]
+    voivode_df = pd.crosstab(filtered_df['MainAddressVoivodeship'], filtered_df['Terminated']).reset_index()
+    voivode_df['count'] = voivode_df[0] + voivode_df[1]
+    voivode_df['TerminatedPercentage'] = voivode_df[1] / voivode_df['count'] * 100.0
+    voivode_df['id'] = voivode_df['MainAddressVoivodeship'].map(woj_ids)
+    fig = px.choropleth_mapbox(voivode_df,
+                               geojson=wojewodztwa_geo,
+                               locations='id',
+                               color='TerminatedPercentage',
+                               zoom=5.5,
+                               center={"lat": 52.10, "lon": 19.42},
+                               opacity=0.5,
+                               hover_name='MainAddressVoivodeship',
+                               title='Map title'
+                               )
+    fig.update_layout(mapbox_style="white-bg")
+    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+    return fig
 
 
 if __name__ == '__main__':
