@@ -4,40 +4,14 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 import plotly.express as px
-
 import pandas as pd
-
 import json
+import dataset
 
-surv_df = pd.read_csv('ceidg_data_surv.csv')
-surv_df.loc[:, 'YearOfStartingOfTheBusiness'] = pd.to_datetime(surv_df['YearOfStartingOfTheBusiness'], format='%Y')
-surv_df.loc[:, 'DateOfStartingOfTheBusiness'] = pd.to_datetime(surv_df['DateOfStartingOfTheBusiness'], format='%Y-%m-%d')
-surv_df.loc[:, 'DateOfTermination'] = pd.to_datetime(surv_df['DateOfTermination'], format='%Y-%m-%d')
+
+surv_df = dataset.load()
 
 surv_removed_df = surv_df[surv_df['Terminated'] == 1]
-
-surv_removed_df.loc[:, 'YearOfTermination'] = surv_removed_df['DateOfTermination'].dt.year
-
-polish_voivodeship = [
-    'dolnośląskie',
-    'kujawsko-pomorskie',
-    'lubelskie',
-    'lubuskie',
-    'łódzkie',
-    'małopolskie',
-    'mazowieckie',
-    'opolskie',
-    'podkarpackie',
-    'podlaskie',
-    'pomorskie',
-    'śląskie',
-    'świętokrzyskie',
-    'warmińsko-mazurskie',
-    'wielkopolskie',
-    'zachodniopomorskie'
-]
-surv_removed_df['MainAddressVoivodeship'] = surv_removed_df.MainAddressVoivodeship.str.lower()
-surv_removed_df = surv_removed_df[surv_removed_df.MainAddressVoivodeship.isin(polish_voivodeship)]
 
 # TIMELINE DATA
 timeline_mock_df = surv_removed_df[(surv_removed_df['MainAddressVoivodeship'] == 'mazowieckie') & (surv_removed_df['PKDMainSection'] == 'G')]
