@@ -30,6 +30,9 @@ def format_raw(df_raw):
     df['DateOfStartingOfTheBusiness'] = pd.to_datetime(df['DateOfStartingOfTheBusiness'], format='%Y-%m-%d')
     df['DateOfTermination'] = pd.to_datetime(df['DateOfTermination'], format='%Y-%m-%d')
 
+    # add year of termination
+    df['YearOfTermination'] = df['DateOfTermination'].dt.year
+
     # fix voivodes names
     df = df.replace(['DOLNOSLąSKIE', 'DOLNOśLąSKIE', 'DOLNOSLĄSKIE', 'DOLNOŚLASKIE', 'DOLNOśLASKIE', 'DOLONOśLąSKIE'], 'DOLNOŚLĄSKIE')\
         .replace(['KUJ POMORSKIE', 'KUJAWSKOPOMORSKIE', 'KUAWSKOPOMORSKIE', 'KUJ.POM.', 'KUJAWAKO-POMORSKIE', 'KUJAWSKO POM', 'KUJAWSKO POMORSKIE', 'KUJAWSKO-POMO', 'KUJAWSKO-POMORSKIE', 'KUJWASKO POMORSKIE'], 'KUJAWSKO-POMORSKIE')\
@@ -63,5 +66,9 @@ def format_raw(df_raw):
         'ZACHODNIOPOMORSKIE'
     ]
     df = df[(df['MainAddressVoivodeship'].isin(voivodes)) & (df['CorrespondenceAddressVoivodeship'].isin(voivodes))]
+
+    # change voivodes to lower
+    df['MainAddressVoivodeship'] = df['MainAddressVoivodeship'].str.lower()
+    df['CorrespondenceAddressVoivodeship'] = df['CorrespondenceAddressVoivodeship'].str.lower()
 
     return df
