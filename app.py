@@ -127,7 +127,7 @@ def update_map(year):
         lon=voivode_df['index'].map(voivodes.get_lon_dict()),
         mode='markers',
         marker=go.scattermapbox.Marker(
-            size=100,
+            size=(voivode_df['all'] - voivode_df['all'].min()) / (voivode_df['all'].max() - voivode_df['all'].min()) * 100,
             color='black'
         )
     )
