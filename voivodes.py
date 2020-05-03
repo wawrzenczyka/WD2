@@ -21,41 +21,41 @@ def get_id_dict():
 
 def get_lat_dict():
     return {
-        'śląskie': 50.20,
-        'opolskie': 50.38,
-        'wielkopolskie': 51.20,
-        'zachodniopomorskie': 53.36,
-        'świętokrzyskie': 50.45,
-        'kujawsko-pomorskie': 53.04,
-        'podlaskie': 53.16,
-        'dolnośląskie': 51.05,
-        'podkarpackie': 49.57,
-        'małopolskie': 49.51,
-        'pomorskie': 54.11,
-        'warmińsko-mazurskie': 53.51,
-        'łódzkie': 51.36,
-        'mazowieckie': 52.2,
-        'lubelskie': 51.13,
-        'lubuskie': 52.11
+        'śląskie': 50.33,
+        'opolskie': 50.63,
+        'wielkopolskie': 51.33,
+        'zachodniopomorskie': 53.6,
+        'świętokrzyskie': 50.75,
+        'kujawsko-pomorskie': 53.07,
+        'podlaskie': 53.27,
+        'dolnośląskie': 51.08,
+        'podkarpackie': 49.95,
+        'małopolskie': 49.85,
+        'pomorskie': 54.18,
+        'warmińsko-mazurskie': 53.85,
+        'łódzkie': 51.6,
+        'mazowieckie': 52.33,
+        'lubelskie': 51.22,
+        'lubuskie': 52.18
     }
 
 
 def get_lon_dict():
     return {
         'śląskie': 19,
-        'opolskie': 17.54,
-        'wielkopolskie': 17.14,
-        'zachodniopomorskie': 15.32,
-        'świętokrzyskie': 20.46,
-        'kujawsko-pomorskie': 18.29,
-        'podlaskie': 22.56,
-        'dolnośląskie': 16.23,
-        'podkarpackie': 22.1,
-        'małopolskie': 20.16,
+        'opolskie': 17.9,
+        'wielkopolskie': 17.32,
+        'zachodniopomorskie': 15.53,
+        'świętokrzyskie': 20.76,
+        'kujawsko-pomorskie': 18.48,
+        'podlaskie': 22.93,
+        'dolnośląskie': 16.38,
+        'podkarpackie': 22.17,
+        'małopolskie': 20.27,
         'pomorskie': 18,
-        'warmińsko-mazurskie': 20.49,
-        'łódzkie': 19.25,
-        'mazowieckie': 21.06,
-        'lubelskie': 22.54,
-        'lubuskie': 15.2
+        'warmińsko-mazurskie': 20.82,
+        'łódzkie': 19.42,
+        'mazowieckie': 21.1,
+        'lubelskie': 22.9,
+        'lubuskie': 15.33
     }
