@@ -141,7 +141,10 @@ def update_map(year):
                                center={"lat": 52.10, "lon": 19.42},
                                opacity=0.5,
                                hover_name='MainAddressVoivodeship',
-                               title='Map title'
+                               labels={
+                                   'TerminatedPercentage': 'Terminated %'
+                               },
+                               title='Voivodes map'
                                )
     fig.update_layout(mapbox_style="white-bg")
     fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
