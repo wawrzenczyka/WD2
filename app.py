@@ -51,19 +51,34 @@ app.layout = html.Div(
         className='section',
         children=[
             dbc.Row(
+                children=[
+                    dbc.Col(md=1,
+                            children=html.H3("Year:")
+                            ),
+                    dbc.Col(md=11,
+                            children=dcc.Slider(
+                                    min=2011,
+                                    max=2020,
+                                    step=1,
+                                    value=2020,
+                                    marks={year: str(year) for year in range(2011, 2021)}
+                                )
+                            )
+                ]
+            ),
+            dbc.Row(
                 className='top',
                 no_gutters=True,
                 children=[
                     dbc.Col(md=8,
                             children=dcc.Graph(
-                                className='fill-height',
-                                figure=fig
-                            )
+                                    className='fill-height',
+                                    figure=fig
+                                )
                             ),
                     dbc.Col(md=4,
                             children=html.Div("TreeMap")
-                            ),
-
+                            )
                 ]),
             dbc.Row(
                 className='bottom',
