@@ -2,7 +2,6 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 import plotly.express as px
@@ -10,6 +9,7 @@ import pandas as pd
 import json
 import dataset
 from treemap_helper import build_pkd_treemap
+from map_helper import build_map
 
 
 surv_df = dataset.load()
@@ -156,7 +156,12 @@ app.layout = html.Div(
                             )
                             ),
                     dbc.Col(md=4,
-                            children=html.Div("TEXT")
+                            className='box',
+                            children=[
+                                dcc.Textarea(id='info-voivode', value=''),
+                                dcc.Textarea(id='info-pkd', value=''),
+                                dcc.Textarea(id='info-pr-terminated', value=''),
+                            ]
                             ),
 
                 ])
@@ -173,40 +178,7 @@ app.layout = html.Div(
         Input('map-data-radiobuttons', 'value')
     ])
 def update_map(year, map_type, data_type):
-    data = {'geojson': wojewodztwa_geo, 'column': 'MainAddressVoivodeship'} \
-        if data_type == 0 else {'geojson': powiaty_geo, 'column': 'MainAddressCounty'}
-
-    map = {'color': 'active', 'range': (0, 43000)} \
-        if map_type == 0 else {'color': 'TerminatedPercentage', 'range': (0, 80)}
-
-    terminated = surv_df[surv_df['YearOfTermination'] <= year][data['column']].value_counts()
-    all = surv_df[data['column']].value_counts()
-    voivode_df = pd.concat([terminated, all], axis=1, keys=['terminated', 'all'], sort=True).reset_index()
-    voivode_df['TerminatedPercentage'] = voivode_df['terminated'] / voivode_df['all'] * 100.0
-    voivode_df['active'] = voivode_df['all'] - voivode_df['terminated']
-
-    fig = px.choropleth_mapbox(voivode_df,
-                               geojson=data['geojson'],
-                               locations='index',
-                               featureidkey='properties.nazwa',
-                               color=map['color'],
-                               opacity=0.5,
-                               range_color=map['range'],
-                               hover_name='index',
-                               hover_data=[map['color']],
-                               labels={
-                                   'active': 'Number of active companies',
-                                   'TerminatedPercentage': '% of terminated companies'
-                               },
-                               title='Map'
-                               )
-    fig.update_layout(
-        mapbox_style="white-bg",
-        mapbox_center={"lat": 52.10, "lon": 19.42},
-        mapbox_zoom=5,
-        margin={"r": 0, "t": 0, "l": 0, "b": 0}
-    )
-    return fig
+    return build_map(year, map_type, data_type, surv_df, wojewodztwa_geo, powiaty_geo)
 
 
 @app.callback(
