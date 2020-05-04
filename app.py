@@ -67,22 +67,47 @@ app.layout = html.Div(
                     dbc.Col(md=8,
                             className='fill-height',
                             children=[
-                                dcc.Dropdown(
-                                    id='map-type-filter',
-                                    options=[{'label': i, 'value': i} for i in map_type_options],
-                                    value=map_type_options[0],
-                                    style={
-                                        'width': '60%'
-                                    }
-                                ),
-                                dcc.RadioItems(
-                                    id='map-data-radiobuttons',
-                                    options=[
-                                        {'label': 'Voivodes', 'value': 'w'},
-                                        {'label': 'Counties', 'value': 'p'}
-                                    ],
-                                    value='w',
-                                    labelStyle={'display': 'inline-block'}
+                                dbc.Row(
+                                    no_gutters=True,
+                                    children=
+                                    [
+                                        dbc.Col(md=6,
+                                                className='fill-height',
+                                                children=[
+                                                    html.H5('Filter:'),
+                                                    dcc.RadioItems(
+                                                        id='map-type-radiobuttons',
+                                                        options=[
+                                                            {'label': 'Active companies', 'value': 0},
+                                                            {'label': '% of terminated companies', 'value': 1}
+                                                        ],
+                                                        value=0,
+                                                        labelStyle={
+                                                            'display': 'inline-block',
+                                                            'padding': 5
+                                                        }
+                                                    )
+                                                 ]
+                                                ),
+                                        dbc.Col(md=6,
+                                                className='fill-height',
+                                                children=[
+                                                    html.H5('Partition:'),
+                                                    dcc.RadioItems(
+                                                        id='map-data-radiobuttons',
+                                                        options=[
+                                                            {'label': 'Voivodes', 'value': 0},
+                                                            {'label': 'Counties', 'value': 1}
+                                                        ],
+                                                        value=0,
+                                                        labelStyle={
+                                                            'display': 'inline-block',
+                                                            'padding': 5
+                                                        }
+                                                    )
+                                                    ]
+                                                )
+                                    ]
                                 ),
                                 dcc.Graph(
                                     id='map',
@@ -125,15 +150,15 @@ app.layout = html.Div(
     Output('map', 'figure'),
     [
         Input('year-slider', 'value'),
-        Input('map-type-filter', 'value'),
+        Input('map-type-radiobuttons', 'value'),
         Input('map-data-radiobuttons', 'value')
     ])
 def update_map(year, map_type, data_type):
     data = {'geojson': wojewodztwa_geo, 'column': 'MainAddressVoivodeship'} \
-        if data_type == 'w' else {'geojson': powiaty_geo, 'column': 'MainAddressCounty'}
+        if data_type == 0 else {'geojson': powiaty_geo, 'column': 'MainAddressCounty'}
 
     map = {'color': 'active', 'range': (0, 43000)} \
-        if map_type == map_type_options[0] else {'color': 'TerminatedPercentage', 'range': (0, 80)}
+        if map_type == 0 else {'color': 'TerminatedPercentage', 'range': (0, 80)}
 
     terminated = surv_df[surv_df['YearOfTermination'] <= year][data['column']].value_counts()
     all = surv_df[data['column']].value_counts()
