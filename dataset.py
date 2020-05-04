@@ -3,16 +3,16 @@ import os
 
 
 def load_raw():
-    return pd.read_csv('ceidg_data_surv.csv')
+    return pd.read_csv('ceidg_data_surv.csv', encoding="utf-8")
 
 
 def load():
     dfpath = './ceidg_data_surv_formatted.csv'
     if os.path.isfile(dfpath):
-        return pd.read_csv(dfpath)
+        return pd.read_csv(dfpath, encoding="utf-8")
     else:
         df = format_raw(load_raw())
-        df.to_csv(dfpath, index=False)
+        df.to_csv(dfpath, index=False, encoding="utf-8")
         return df
 
 
@@ -65,10 +65,41 @@ def format_raw(df_raw):
         'WIELKOPOLSKIE',
         'ZACHODNIOPOMORSKIE'
     ]
-    df = df[(df['MainAddressVoivodeship'].isin(voivodes)) & (df['CorrespondenceAddressVoivodeship'].isin(voivodes))]
+    df = df[df['MainAddressVoivodeship'].isin(voivodes)]
 
     # change voivodes to lower
     df['MainAddressVoivodeship'] = df['MainAddressVoivodeship'].str.lower()
-    df['CorrespondenceAddressVoivodeship'] = df['CorrespondenceAddressVoivodeship'].str.lower()
+
+    # format county
+    df['MainAddressCounty'] = replace_polish_chars(df['MainAddressCounty'].str.lower(), regex=True)
+
+    # add voivode names for counties that appear in multiple voivodes
+    tmp_df = df[df['MainAddressCounty'].isin([
+        'nowodworski',
+        'opolski',
+        'krosnienski',
+        'brzeski',
+        'grodziski',
+        'tomaszowski',
+        'swidnicki',
+        'bielski',
+        'sredzki',
+        'ostrowski'
+    ])]
+    df.loc[tmp_df.index, 'MainAddressCounty'] = replace_polish_chars(tmp_df['MainAddressVoivodeship'].str.lower(), regex=True)\
+        + '/' + tmp_df['MainAddressCounty']
 
     return df
+
+
+def replace_polish_chars(obj, **kwargs):
+    return obj\
+        .replace('ą', 'a', **kwargs)\
+        .replace('ć', 'c', **kwargs)\
+        .replace('ę', 'e', **kwargs)\
+        .replace('ł', 'l', **kwargs)\
+        .replace('ń', 'n', **kwargs)\
+        .replace('ó', 'o', **kwargs)\
+        .replace('ś', 's', **kwargs)\
+        .replace('ź', 'z', **kwargs)\
+        .replace('ż', 'z', **kwargs)

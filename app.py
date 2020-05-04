@@ -6,16 +6,13 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 import plotly.express as px
-import plotly.graph_objects as go
 import pandas as pd
 import json
 import dataset
-import voivodes
 from treemap_helper import build_pkd_treemap
 
 
 surv_df = dataset.load()
-
 surv_removed_df = surv_df[surv_df['Terminated'] == 1]
 
 
@@ -37,12 +34,16 @@ timeline_mock_df = pd.DataFrame({'count': timeline_mock_df.groupby("YearOfTermin
 with open('assets/wojewodztwa-medium.geojson', encoding='utf8') as woj_json:
     wojewodztwa_geo = json.load(woj_json)
 
-mock_map_df = pd.DataFrame(
-    {
-        'woj_id': [i for i in range(16)],
-        'mock_val': [i for i in range(16)]
-    }
-)
+with open('assets/powiaty-medium.geojson', encoding='utf8') as pow_json:
+    powiaty_geo = json.load(pow_json)
+
+# map county names to lower
+for feature in powiaty_geo['features']:
+    feature['properties']['nazwa'] = dataset\
+        .replace_polish_chars(str.lower(feature['properties']['nazwa'])\
+                              .lstrip('powiat').strip())
+
+map_type_options = ['Active companies', '% of terminated companies']
 
 app = dash.Dash(__name__, external_stylesheets=[
     dbc.themes.BOOTSTRAP,
@@ -76,13 +77,57 @@ app.layout = html.Div(
                 no_gutters=True,
                 children=[
                     dbc.Col(md=8,
-                            children=dcc.Graph(
-                                id='map',
-                                className='fill-height'
-                            )
+                            className='box',
+                            children=[
+                                dbc.Row(
+                                    no_gutters=True,
+                                    children=
+                                    [
+                                        dbc.Col(md=6,
+                                                className='fill-height',
+                                                children=[
+                                                    html.H5('Filter:'),
+                                                    dcc.RadioItems(
+                                                        id='map-type-radiobuttons',
+                                                        options=[
+                                                            {'label': 'Active companies', 'value': 0},
+                                                            {'label': '% of terminated companies', 'value': 1}
+                                                        ],
+                                                        value=0,
+                                                        labelStyle={
+                                                            'display': 'inline-block',
+                                                            'padding': 5
+                                                        }
+                                                    )
+                                                 ]
+                                                ),
+                                        dbc.Col(md=6,
+                                                className='fill-height',
+                                                children=[
+                                                    html.H5('Partition:'),
+                                                    dcc.RadioItems(
+                                                        id='map-data-radiobuttons',
+                                                        options=[
+                                                            {'label': 'Voivodes', 'value': 0},
+                                                            {'label': 'Counties', 'value': 1}
+                                                        ],
+                                                        value=0,
+                                                        labelStyle={
+                                                            'display': 'inline-block',
+                                                            'padding': 5
+                                                        }
+                                                    )
+                                                    ]
+                                                )
+                                    ]
+                                ),
+                                dcc.Graph(
+                                    id='map',
+                                    className='fill-height'
+                                )]
                             ),
                     dbc.Col(md=4,
-                            className='fill-height',
+                            className='box',
                             children=[
                                 dcc.Dropdown(
                                     id='voivodeship-input',
@@ -97,7 +142,7 @@ app.layout = html.Div(
                 no_gutters=True,
                 children=[
                     dbc.Col(md=8,
-                            className='fill-height',
+                            className='box',
                             children=dcc.Graph(
                                 className='fill-height',
                                 id='timeline',
@@ -122,36 +167,39 @@ app.layout = html.Div(
 
 @app.callback(
     Output('map', 'figure'),
-    [Input('year-slider', 'value')])
-def update_map(year):
-    terminated = surv_df[surv_df['YearOfTermination'] <= year]['MainAddressVoivodeship'].value_counts()
-    all = surv_df['MainAddressVoivodeship'].value_counts()
-    voivode_df = pd.concat([terminated, all], axis=1, keys=['terminated', 'all']).reset_index()
+    [
+        Input('year-slider', 'value'),
+        Input('map-type-radiobuttons', 'value'),
+        Input('map-data-radiobuttons', 'value')
+    ])
+def update_map(year, map_type, data_type):
+    data = {'geojson': wojewodztwa_geo, 'column': 'MainAddressVoivodeship'} \
+        if data_type == 0 else {'geojson': powiaty_geo, 'column': 'MainAddressCounty'}
+
+    map = {'color': 'active', 'range': (0, 43000)} \
+        if map_type == 0 else {'color': 'TerminatedPercentage', 'range': (0, 80)}
+
+    terminated = surv_df[surv_df['YearOfTermination'] <= year][data['column']].value_counts()
+    all = surv_df[data['column']].value_counts()
+    voivode_df = pd.concat([terminated, all], axis=1, keys=['terminated', 'all'], sort=True).reset_index()
     voivode_df['TerminatedPercentage'] = voivode_df['terminated'] / voivode_df['all'] * 100.0
+    voivode_df['active'] = voivode_df['all'] - voivode_df['terminated']
+
     fig = px.choropleth_mapbox(voivode_df,
-                               geojson=wojewodztwa_geo,
+                               geojson=data['geojson'],
                                locations='index',
                                featureidkey='properties.nazwa',
-                               range_color=(0, 80),
-                               color='TerminatedPercentage',
+                               color=map['color'],
                                opacity=0.5,
+                               range_color=map['range'],
                                hover_name='index',
+                               hover_data=[map['color']],
                                labels={
-                                   'TerminatedPercentage': 'Terminated %'
+                                   'active': 'Number of active companies',
+                                   'TerminatedPercentage': '% of terminated companies'
                                },
-                               title='Voivodes map'
+                               title='Map'
                                )
-    scatter = go.Scattermapbox(
-        lat=voivode_df['index'].map(voivodes.get_lat_dict()),
-        lon=voivode_df['index'].map(voivodes.get_lon_dict()),
-        mode='markers',
-        marker=go.scattermapbox.Marker(
-            size=(voivode_df['all'] - voivode_df['all'].min())
-            / (voivode_df['all'].max() - voivode_df['all'].min()) * 100,
-            color='black'
-        )
-    )
-    fig.append_trace(scatter, 1, 1)
     fig.update_layout(
         mapbox_style="white-bg",
         mapbox_center={"lat": 52.10, "lon": 19.42},
@@ -163,7 +211,7 @@ def update_map(year):
 
 @app.callback(
     Output('pkd-tree', 'figure'),
-    [Input('voivodeship-input', 'value'),])
+    [Input('voivodeship-input', 'value')])
 def update_graph(voivodeship):
     return build_pkd_treemap(voivodeship=voivodeship)
 
