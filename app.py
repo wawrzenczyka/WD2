@@ -27,17 +27,9 @@ with open('assets/powiaty-medium.geojson', encoding='utf8') as pow_json:
 
 # map county names to lower
 for feature in powiaty_geo['features']:
-    feature['properties']['nazwa'] = str.lower(feature['properties']['nazwa']) \
-        .lstrip('powiat').strip() \
-        .replace('ą', 'a') \
-        .replace('ć', 'c') \
-        .replace('ę', 'e') \
-        .replace('ł', 'l') \
-        .replace('ń', 'n') \
-        .replace('ó', 'o') \
-        .replace('ś', 's') \
-        .replace('ź', 'z') \
-        .replace('ż', 'z')
+    feature['properties']['nazwa'] = dataset\
+        .replace_polish_chars(str.lower(feature['properties']['nazwa'])\
+                              .lstrip('powiat').strip())
 
 map_type_options = ['Active companies', '% of terminated companies']
 

@@ -65,33 +65,13 @@ def format_raw(df_raw):
         'WIELKOPOLSKIE',
         'ZACHODNIOPOMORSKIE'
     ]
-    df = df[(df['MainAddressVoivodeship'].isin(voivodes)) & (df['CorrespondenceAddressVoivodeship'].isin(voivodes))]
+    df = df[df['MainAddressVoivodeship'].isin(voivodes)]
 
     # change voivodes to lower
     df['MainAddressVoivodeship'] = df['MainAddressVoivodeship'].str.lower()
-    df['CorrespondenceAddressVoivodeship'] = df['CorrespondenceAddressVoivodeship'].str.lower()
 
     # format county
-    df['MainAddressCounty'] = df['MainAddressCounty'].str.lower()\
-        .replace('ą', 'a', regex=True)\
-        .replace('ć', 'c', regex=True)\
-        .replace('ę', 'e', regex=True)\
-        .replace('ł', 'l', regex=True)\
-        .replace('ń', 'n', regex=True)\
-        .replace('ó', 'o', regex=True)\
-        .replace('ś', 's', regex=True)\
-        .replace('ź', 'z', regex=True)\
-        .replace('ż', 'z', regex=True)
-    df['CorrespondenceAddressCounty'] = df['CorrespondenceAddressCounty'].str.lower()\
-        .replace('ą', 'a', regex=True)\
-        .replace('ć', 'c', regex=True)\
-        .replace('ę', 'e', regex=True)\
-        .replace('ł', 'l', regex=True)\
-        .replace('ń', 'n', regex=True)\
-        .replace('ó', 'o', regex=True)\
-        .replace('ś', 's', regex=True)\
-        .replace('ź', 'z', regex=True)\
-        .replace('ż', 'z', regex=True)
+    df['MainAddressCounty'] = replace_polish_chars(df['MainAddressCounty'].str.lower(), regex=True)
 
     # add voivode names for counties that appear in multiple voivodes
     tmp_df = df[df['MainAddressCounty'].isin([
@@ -106,15 +86,20 @@ def format_raw(df_raw):
         'sredzki',
         'ostrowski'
     ])]
-    df.loc[tmp_df.index, 'MainAddressCounty'] = tmp_df['MainAddressVoivodeship'].str.lower()\
-        .replace('ą', 'a', regex=True)\
-        .replace('ć', 'c', regex=True)\
-        .replace('ę', 'e', regex=True)\
-        .replace('ł', 'l', regex=True)\
-        .replace('ń', 'n', regex=True)\
-        .replace('ó', 'o', regex=True)\
-        .replace('ś', 's', regex=True)\
-        .replace('ź', 'z', regex=True)\
-        .replace('ż', 'z', regex=True) + '/' + tmp_df['MainAddressCounty']
+    df.loc[tmp_df.index, 'MainAddressCounty'] = replace_polish_chars(tmp_df['MainAddressVoivodeship'].str.lower(), regex=True)\
+        + '/' + tmp_df['MainAddressCounty']
 
     return df
+
+
+def replace_polish_chars(obj, **kwargs):
+    return obj\
+        .replace('ą', 'a', **kwargs)\
+        .replace('ć', 'c', **kwargs)\
+        .replace('ę', 'e', **kwargs)\
+        .replace('ł', 'l', **kwargs)\
+        .replace('ń', 'n', **kwargs)\
+        .replace('ó', 'o', **kwargs)\
+        .replace('ś', 's', **kwargs)\
+        .replace('ź', 'z', **kwargs)\
+        .replace('ż', 'z', **kwargs)
