@@ -27,16 +27,16 @@ with open('assets/powiaty-medium.geojson', encoding='utf8') as pow_json:
 
 # map county names to lower
 for feature in powiaty_geo['features']:
-    feature['properties']['nazwa'] = str.lower(feature['properties']['nazwa'])\
-        .lstrip('powiat').strip()\
-        .replace('ą', 'a')\
-        .replace('ć', 'c')\
-        .replace('ę', 'e')\
-        .replace('ł', 'l')\
-        .replace('ń', 'n')\
-        .replace('ó', 'o')\
-        .replace('ś', 's')\
-        .replace('ź', 'z')\
+    feature['properties']['nazwa'] = str.lower(feature['properties']['nazwa']) \
+        .lstrip('powiat').strip() \
+        .replace('ą', 'a') \
+        .replace('ć', 'c') \
+        .replace('ę', 'e') \
+        .replace('ł', 'l') \
+        .replace('ń', 'n') \
+        .replace('ó', 'o') \
+        .replace('ś', 's') \
+        .replace('ź', 'z') \
         .replace('ż', 'z')
 
 map_type_options = ['Active companies', '% of terminated companies']
@@ -92,10 +92,10 @@ app.layout = html.Div(
                                     value='w',
                                     labelStyle={'display': 'inline-block'}
                                 ),
-                                 dcc.Graph(
+                                dcc.Graph(
                                     id='map',
                                     className='fill-height'
-                            )]
+                                )]
                             ),
                     dbc.Col(md=4,
                             children=html.Div("TreeMap")
@@ -137,33 +137,31 @@ app.layout = html.Div(
         Input('map-data-radiobuttons', 'value')
     ])
 def update_map(year, map_type, data_type):
-    data = {
-        'geojson': wojewodztwa_geo,
-        'column': 'MainAddressVoivodeship'
-    } if data_type == 'w' else {
-        'geojson': powiaty_geo,
-        'column': 'MainAddressCounty'
-    }
+    data = {'geojson': wojewodztwa_geo, 'column': 'MainAddressVoivodeship'} \
+        if data_type == 'w' else {'geojson': powiaty_geo, 'column': 'MainAddressCounty'}
+
+    map = {'color': 'active', 'range': (0, 43000)} \
+        if map_type == map_type_options[0] else {'color': 'TerminatedPercentage', 'range': (0, 80)}
+
     terminated = surv_df[surv_df['YearOfTermination'] <= year][data['column']].value_counts()
     all = surv_df[data['column']].value_counts()
-    voivode_df = pd.concat([terminated, all], axis=1, keys=['terminated', 'all']).reset_index()
+    voivode_df = pd.concat([terminated, all], axis=1, keys=['terminated', 'all'], sort=True).reset_index()
     voivode_df['TerminatedPercentage'] = voivode_df['terminated'] / voivode_df['all'] * 100.0
     voivode_df['active'] = voivode_df['all'] - voivode_df['terminated']
-    config = {
-        'color': 'active',
-        'range': (0, 43000)
-    } if map_type == map_type_options[0] else {
-        'color': 'TerminatedPercentage',
-        'range': (0, 80)
-    }
+
     fig = px.choropleth_mapbox(voivode_df,
                                geojson=data['geojson'],
                                locations='index',
                                featureidkey='properties.nazwa',
-                               color=config['color'],
+                               color=map['color'],
                                opacity=0.5,
-                               range_color=config['range'],
+                               range_color=map['range'],
                                hover_name='index',
+                               hover_data=[map['color']],
+                               labels={
+                                   'active': 'Number of active companies',
+                                   'TerminatedPercentage': '% of terminated companies'
+                               },
                                title='Map'
                                )
     fig.update_layout(
