@@ -71,8 +71,26 @@ def format_raw(df_raw):
     df['MainAddressVoivodeship'] = df['MainAddressVoivodeship'].str.lower()
     df['CorrespondenceAddressVoivodeship'] = df['CorrespondenceAddressVoivodeship'].str.lower()
 
-    # format country
-    df['MainAddressCounty'] = 'powiat ' + df['MainAddressCounty'].str.lower()
-    df['CorrespondenceAddressCounty'] = 'powiat ' + df['CorrespondenceAddressCounty'].str.lower()
+    # format county
+    df['MainAddressCounty'] = df['MainAddressCounty'].str.lower()\
+        .replace('ą', 'a', regex=True)\
+        .replace('ć', 'c', regex=True)\
+        .replace('ę', 'e', regex=True)\
+        .replace('ł', 'l', regex=True)\
+        .replace('ń', 'n', regex=True)\
+        .replace('ó', 'o', regex=True)\
+        .replace('ś', 's', regex=True)\
+        .replace('ź', 'z', regex=True)\
+        .replace('ż', 'z', regex=True)
+    df['CorrespondenceAddressCounty'] = df['CorrespondenceAddressCounty'].str.lower()\
+        .replace('ą', 'a', regex=True)\
+        .replace('ć', 'c', regex=True)\
+        .replace('ę', 'e', regex=True)\
+        .replace('ł', 'l', regex=True)\
+        .replace('ń', 'n', regex=True)\
+        .replace('ó', 'o', regex=True)\
+        .replace('ś', 's', regex=True)\
+        .replace('ź', 'z', regex=True)\
+        .replace('ż', 'z', regex=True)
 
     return df
