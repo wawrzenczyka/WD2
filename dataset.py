@@ -3,16 +3,16 @@ import os
 
 
 def load_raw():
-    return pd.read_csv('ceidg_data_surv.csv')
+    return pd.read_csv('ceidg_data_surv.csv', encoding="utf-8")
 
 
 def load():
     dfpath = './ceidg_data_surv_formatted.csv'
     if os.path.isfile(dfpath):
-        return pd.read_csv(dfpath)
+        return pd.read_csv(dfpath, encoding="utf-8")
     else:
         df = format_raw(load_raw())
-        df.to_csv(dfpath, index=False)
+        df.to_csv(dfpath, index=False, encoding="utf-8")
         return df
 
 
@@ -101,8 +101,20 @@ def format_raw(df_raw):
         'brzeski',
         'grodziski',
         'tomaszowski',
-        'swidnicki'
+        'swidnicki',
+        'bielski',
+        'sredzki',
+        'ostrowski'
     ])]
-    df.loc[tmp_df.index, 'MainAddressCounty'] = tmp_df['MainAddressVoivodeship'] + '/' + tmp_df['MainAddressCounty']
+    df.loc[tmp_df.index, 'MainAddressCounty'] = tmp_df['MainAddressVoivodeship'].str.lower()\
+        .replace('ą', 'a', regex=True)\
+        .replace('ć', 'c', regex=True)\
+        .replace('ę', 'e', regex=True)\
+        .replace('ł', 'l', regex=True)\
+        .replace('ń', 'n', regex=True)\
+        .replace('ó', 'o', regex=True)\
+        .replace('ś', 's', regex=True)\
+        .replace('ź', 'z', regex=True)\
+        .replace('ż', 'z', regex=True) + '/' + tmp_df['MainAddressCounty']
 
     return df
