@@ -12,6 +12,7 @@ import dataset
 import voivodes
 
 surv_df = dataset.load()
+all = surv_df['MainAddressVoivodeship'].value_counts()
 
 surv_removed_df = surv_df[surv_df['Terminated'] == 1]
 
@@ -31,6 +32,8 @@ mock_map_df = pd.DataFrame(
         'mock_val': [i for i in range(16)]
     }
 )
+
+map_type_options = ['Active companies', '% of terminated companies']
 
 app = dash.Dash(__name__, external_stylesheets=[
     dbc.themes.BOOTSTRAP,
@@ -64,10 +67,20 @@ app.layout = html.Div(
                 no_gutters=True,
                 children=[
                     dbc.Col(md=8,
-                            children=dcc.Graph(
-                                id='map',
-                                className='fill-height'
-                            )
+                            className='fill-height',
+                            children=[
+                                dcc.Dropdown(
+                                    id='map-type-filter',
+                                    options=[{'label': i, 'value': i} for i in map_type_options],
+                                    value=map_type_options[0],
+                                    style={
+                                        'width': '60%'
+                                    }
+                                ),
+                                dcc.Graph(
+                                    id='map',
+                                    className='fill-height'
+                            )]
                             ),
                     dbc.Col(md=4,
                             children=html.Div("TreeMap")
@@ -103,36 +116,43 @@ app.layout = html.Div(
 
 @app.callback(
     Output('map', 'figure'),
-    [Input('year-slider', 'value')])
-def update_map(year):
+    [
+        Input('year-slider', 'value'),
+        Input('map-type-filter', 'value')
+    ])
+def update_map(year, map_type):
     terminated = surv_df[surv_df['YearOfTermination'] <= year]['MainAddressVoivodeship'].value_counts()
-    all = surv_df['MainAddressVoivodeship'].value_counts()
     voivode_df = pd.concat([terminated, all], axis=1, keys=['terminated', 'all']).reset_index()
     voivode_df['TerminatedPercentage'] = voivode_df['terminated'] / voivode_df['all'] * 100.0
     voivode_df['id'] = voivode_df['index'].map(voivodes.get_id_dict())
-    fig = px.choropleth_mapbox(voivode_df,
-                               geojson=wojewodztwa_geo,
-                               locations='id',
-                               range_color=(0, 80),
-                               color='TerminatedPercentage',
-                               opacity=0.5,
-                               hover_name='index',
-                               labels={
-                                   'TerminatedPercentage': 'Terminated %'
-                               },
-                               title='Voivodes map'
-                               )
-    scatter = go.Scattermapbox(
-        lat=voivode_df['index'].map(voivodes.get_lat_dict()),
-        lon=voivode_df['index'].map(voivodes.get_lon_dict()),
-        mode='markers',
-        marker=go.scattermapbox.Marker(
-            size=(voivode_df['all'] - voivode_df['all'].min())
-            / (voivode_df['all'].max() - voivode_df['all'].min()) * 100,
-            color='black'
-        )
-    )
-    fig.append_trace(scatter, 1, 1)
+    voivode_df.loc[:, 'active'] = voivode_df['all'] - voivode_df['terminated']
+    fig = None
+    if map_type == map_type_options[0]:
+        fig = px.choropleth_mapbox(voivode_df,
+                                   geojson=wojewodztwa_geo,
+                                   locations='id',
+                                   color='active',
+                                   opacity=0.5,
+                                   range_color=(0, 43000),
+                                   hover_name='index',
+                                   labels={
+                                       'active': 'Active companies'
+                                   },
+                                   title='Voivodes map'
+                                   )
+    elif map_type == map_type_options[1]:
+        fig = px.choropleth_mapbox(voivode_df,
+                                   geojson=wojewodztwa_geo,
+                                   locations='id',
+                                   range_color=(0, 80),
+                                   color='TerminatedPercentage',
+                                   opacity=0.5,
+                                   hover_name='index',
+                                   labels={
+                                       'TerminatedPercentage': 'Terminated %'
+                                   },
+                                   title='Voivodes map'
+                                   )
     fig.update_layout(
         mapbox_style="white-bg",
         mapbox_center={"lat": 52.10, "lon": 19.42},
