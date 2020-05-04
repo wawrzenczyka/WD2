@@ -93,4 +93,16 @@ def format_raw(df_raw):
         .replace('ź', 'z', regex=True)\
         .replace('ż', 'z', regex=True)
 
+    # add voivode names for counties that appear in multiple voivodes
+    tmp_df = df[df['MainAddressCounty'].isin([
+        'nowodworski',
+        'opolski',
+        'krosnienski',
+        'brzeski',
+        'grodziski',
+        'tomaszowski',
+        'swidnicki'
+    ])]
+    df.loc[tmp_df.index, 'MainAddressCounty'] = tmp_df['MainAddressVoivodeship'] + '/' + tmp_df['MainAddressCounty']
+
     return df
