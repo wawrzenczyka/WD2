@@ -71,4 +71,8 @@ def format_raw(df_raw):
     df['MainAddressVoivodeship'] = df['MainAddressVoivodeship'].str.lower()
     df['CorrespondenceAddressVoivodeship'] = df['CorrespondenceAddressVoivodeship'].str.lower()
 
+    # format country
+    df['MainAddressCounty'] = 'powiat ' + df['MainAddressCounty'].str.lower()
+    df['CorrespondenceAddressCounty'] = 'powiat ' + df['CorrespondenceAddressCounty'].str.lower()
+
     return df
