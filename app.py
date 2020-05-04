@@ -22,7 +22,7 @@ timeline_mock_df = surv_removed_df[
 timeline_mock_df = pd.DataFrame({'count': timeline_mock_df.groupby("YearOfTermination").size()}).reset_index()
 
 # MAP
-with open('assets/wojewodztwa-medium.geojson') as woj_json:
+with open('assets/wojewodztwa-medium.geojson', encoding='utf8') as woj_json:
     wojewodztwa_geo = json.load(woj_json)
 
 mock_map_df = pd.DataFrame(
@@ -112,7 +112,8 @@ def update_map(year):
     voivode_df['id'] = voivode_df['index'].map(voivodes.get_id_dict())
     fig = px.choropleth_mapbox(voivode_df,
                                geojson=wojewodztwa_geo,
-                               locations='id',
+                               locations='index',
+                               featureidkey='properties.nazwa',
                                range_color=(0, 80),
                                color='TerminatedPercentage',
                                opacity=0.5,
