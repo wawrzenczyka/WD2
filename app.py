@@ -5,15 +5,11 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 import plotly.express as px
-import plotly.graph_objects as go
 import pandas as pd
 import json
 import dataset
-import voivodes
 
 surv_df = dataset.load()
-all = surv_df['MainAddressVoivodeship'].value_counts()
-
 surv_removed_df = surv_df[surv_df['Terminated'] == 1]
 
 # TIMELINE DATA
@@ -43,27 +39,6 @@ for feature in powiaty_geo['features']:
         .replace('ź', 'z')\
         .replace('ż', 'z')
 
-mock_map_df = pd.DataFrame(
-    {
-        'woj_id': [i for i in range(16)],
-        'mock_val': [i for i in range(16)]
-    }
-)
-
-tmp_df = surv_df['MainAddressCounty'].value_counts().reset_index().sort_values(by='index')
-fig2 = px.choropleth_mapbox(tmp_df,
-        geojson=powiaty_geo,
-        featureidkey='properties.name',
-        locations='index',
-        color='MainAddressCounty',
-        hover_name='index'
-)
-fig2.update_layout(
-    mapbox_style="white-bg",
-    mapbox_center={"lat": 52.10, "lon": 19.42},
-    mapbox_zoom=5,
-    margin={"r": 0, "t": 0, "l": 0, "b": 0}
-)
 map_type_options = ['Active companies', '% of terminated companies']
 
 app = dash.Dash(__name__, external_stylesheets=[
