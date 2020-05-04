@@ -31,7 +31,7 @@ with open('assets/powiaty-medium.geojson', encoding='utf8') as pow_json:
 
 # map county names to lower
 for feature in powiaty_geo['features']:
-    feature['properties']['name'] = str.lower(feature['properties']['nazwa'])\
+    feature['properties']['nazwa'] = str.lower(feature['properties']['nazwa'])\
         .lstrip('powiat').strip()\
         .replace('ą', 'a')\
         .replace('ć', 'c')\
@@ -108,7 +108,16 @@ app.layout = html.Div(
                                         'width': '60%'
                                     }
                                 ),
-                                dcc.Graph(
+                                dcc.RadioItems(
+                                    id='map-data-radiobuttons',
+                                    options=[
+                                        {'label': 'Voivodes', 'value': 'w'},
+                                        {'label': 'Counties', 'value': 'p'}
+                                    ],
+                                    value='w',
+                                    labelStyle={'display': 'inline-block'}
+                                ),
+                                 dcc.Graph(
                                     id='map',
                                     className='fill-height'
                             )]
@@ -149,12 +158,19 @@ app.layout = html.Div(
     Output('map', 'figure'),
     [
         Input('year-slider', 'value'),
-        Input('map-type-filter', 'value')
+        Input('map-type-filter', 'value'),
+        Input('map-data-radiobuttons', 'value')
     ])
-def update_map(year, map_type):
-    chosen_col = 'MainAddressVoivodeship'
-    terminated = surv_df[surv_df['YearOfTermination'] <= year][chosen_col].value_counts()
-    all = surv_df[chosen_col].value_counts()
+def update_map(year, map_type, data_type):
+    data = {
+        'geojson': wojewodztwa_geo,
+        'column': 'MainAddressVoivodeship'
+    } if data_type == 'w' else {
+        'geojson': powiaty_geo,
+        'column': 'MainAddressCounty'
+    }
+    terminated = surv_df[surv_df['YearOfTermination'] <= year][data['column']].value_counts()
+    all = surv_df[data['column']].value_counts()
     voivode_df = pd.concat([terminated, all], axis=1, keys=['terminated', 'all']).reset_index()
     voivode_df['TerminatedPercentage'] = voivode_df['terminated'] / voivode_df['all'] * 100.0
     voivode_df['active'] = voivode_df['all'] - voivode_df['terminated']
@@ -166,7 +182,7 @@ def update_map(year, map_type):
         'range': (0, 80)
     }
     fig = px.choropleth_mapbox(voivode_df,
-                               geojson=wojewodztwa_geo,
+                               geojson=data['geojson'],
                                locations='index',
                                featureidkey='properties.nazwa',
                                color=config['color'],
