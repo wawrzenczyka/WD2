@@ -109,7 +109,6 @@ def update_map(year):
     all = surv_df['MainAddressVoivodeship'].value_counts()
     voivode_df = pd.concat([terminated, all], axis=1, keys=['terminated', 'all']).reset_index()
     voivode_df['TerminatedPercentage'] = voivode_df['terminated'] / voivode_df['all'] * 100.0
-    voivode_df['id'] = voivode_df['index'].map(voivodes.get_id_dict())
     fig = px.choropleth_mapbox(voivode_df,
                                geojson=wojewodztwa_geo,
                                locations='index',
