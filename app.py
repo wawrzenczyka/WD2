@@ -39,6 +39,14 @@ app = dash.Dash(__name__, external_stylesheets=[
     './first-tab.css'
 ])
 
+styles = {
+    'pre': {
+        'border': 'thin lightgrey solid',
+        'overflowX': 'scroll'
+    }
+}
+
+
 app.layout = html.Div(
     className='main-wrapper',
     children=html.Div(
@@ -94,8 +102,10 @@ app.layout = html.Div(
                                 ),
                                 dcc.Graph(
                                     id='map',
-                                    className='fill-height'
-                                )]
+                                    className='fill-height',
+                                ),                              
+                                html.Div(id="output")
+                            ]
                             ),
                     dbc.Col(md=6,
                             className='box',
@@ -128,10 +138,11 @@ app.layout = html.Div(
                                 dcc.Graph(figure=pkd_fig, id='pkd-tree', className='fill-height'),
                             ]
                             )
-                ])
+                ]),
         ]
     )
 )
+
 
 
 @app.callback(
@@ -143,6 +154,12 @@ app.layout = html.Div(
 def update_map(year, map_type):
     return build_map(year, map_type, surv_df, wojewodztwa_geo)
 
+@app.callback(
+    Output('output', 'children'),
+    [Input('map', 'clickData')])
+def on_map_click(voivodeshipData):
+    #tu robimy sensowne rzeczy po zaznaczeniu województwa
+    return str(voivodeshipData)
 
 @app.callback(
     Output('pkd-tree', 'figure'),

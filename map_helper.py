@@ -1,4 +1,5 @@
 import plotly.express as px
+import plotly.graph_objects as go
 import pandas as pd
 
 
@@ -13,10 +14,13 @@ def build_map(
     map = {'color': 'active', 'range': (0, 43000)} \
         if map_type == 0 else {'color': 'TerminatedPercentage', 'range': (0, 80)}
 
-    terminated = surv_df[surv_df['YearOfTermination'] <= year][data['column']].value_counts()
+    terminated = surv_df[surv_df['YearOfTermination']
+                         <= year][data['column']].value_counts()
     all = surv_df[data['column']].value_counts()
-    voivode_df = pd.concat([terminated, all], axis=1, keys=['terminated', 'all'], sort=True).reset_index()
-    voivode_df['TerminatedPercentage'] = voivode_df['terminated'] / voivode_df['all'] * 100.0
+    voivode_df = pd.concat([terminated, all], axis=1, keys=[
+                           'terminated', 'all'], sort=True).reset_index()
+    voivode_df['TerminatedPercentage'] = voivode_df['terminated'] / \
+        voivode_df['all'] * 100.0
     voivode_df['active'] = voivode_df['all'] - voivode_df['terminated']
 
     fig = px.choropleth_mapbox(voivode_df,
@@ -34,10 +38,12 @@ def build_map(
                                },
                                title='Map'
                                )
+
     fig.update_layout(
         mapbox_style="white-bg",
         mapbox_center={"lat": 52.10, "lon": 19.42},
         mapbox_zoom=5,
-        margin={"r": 0, "t": 0, "l": 0, "b": 0}
+        margin={"r": 0, "t": 0, "l": 0, "b": 0},
+        clickmode='event+select'
     )
     return fig
