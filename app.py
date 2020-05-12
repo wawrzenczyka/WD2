@@ -11,10 +11,8 @@ import dataset
 from treemap_helper import build_pkd_treemap
 from map_helper import build_map
 
-
 surv_df = dataset.load()
 surv_removed_df = surv_df[surv_df['Terminated'] == 1]
-
 
 pkd_fig = build_pkd_treemap()
 
@@ -33,7 +31,6 @@ timeline_mock_df = pd.DataFrame({'count': timeline_mock_df.groupby("YearOfTermin
 # MAP
 with open('assets/wojewodztwa-min.geojson', encoding='utf8') as woj_json:
     wojewodztwa_geo = json.load(woj_json)
-
 
 map_type_options = ['Active companies', '% of terminated companies']
 
@@ -68,7 +65,7 @@ app.layout = html.Div(
                 className='top',
                 no_gutters=True,
                 children=[
-                    dbc.Col(md=8,
+                    dbc.Col(md=6,
                             className='box',
                             children=[
                                 dbc.Row(
@@ -91,7 +88,7 @@ app.layout = html.Div(
                                                             'padding': 5
                                                         }
                                                     )
-                                                 ]
+                                                ]
                                                 )
                                     ]
                                 ),
@@ -100,44 +97,37 @@ app.layout = html.Div(
                                     className='fill-height'
                                 )]
                             ),
-                    dbc.Col(md=4,
+                    dbc.Col(md=6,
                             className='box',
                             children=[
-                                dcc.Dropdown(
-                                    id='voivodeship-input',
-                                    options=[{'label': i, 'value': voivodeship_select[i]} for i in voivodeship_select],
-                                    value=None
-                                    ),
-                                dcc.Graph(figure=pkd_fig, id='pkd-tree', className='fill-height')]
+                                dcc.Graph(
+                                    className='fill-height',
+                                    id='timeline',
+                                    responsive=False,
+                                    figure={
+                                        'data': [dict(
+                                            x=timeline_mock_df['YearOfTermination'],
+                                            y=timeline_mock_df['count']
+                                        )]
+                                    }
+                                )
+                            ]
                             )
                 ]),
             dbc.Row(
                 className='bottom',
                 no_gutters=True,
                 children=[
-                    dbc.Col(md=8,
-                            className='box',
-                            children=dcc.Graph(
-                                className='fill-height',
-                                id='timeline',
-                                responsive=False,
-                                figure={
-                                    'data': [dict(
-                                        x=timeline_mock_df['YearOfTermination'],
-                                        y=timeline_mock_df['count']
-                                    )]
-                                }
-                            )
-                            ),
-                    dbc.Col(md=4,
-                            className='box',
+                    dbc.Col(md=12,
                             children=[
-                                dcc.Textarea(id='info-voivode', value=''),
-                                dcc.Textarea(id='info-pkd', value=''),
-                                dcc.Textarea(id='info-pr-terminated', value=''),
+                                dcc.Dropdown(
+                                    id='voivodeship-input',
+                                    options=[{'label': i, 'value': voivodeship_select[i]} for i in voivodeship_select],
+                                    value=None
+                                ),
+                                dcc.Graph(figure=pkd_fig, id='pkd-tree', className='fill-height'),
                             ]
-                            ),
-
+                            )
                 ])
         ]
     )
