@@ -31,7 +31,7 @@ timeline_mock_df = surv_removed_df[
 timeline_mock_df = pd.DataFrame({'count': timeline_mock_df.groupby("YearOfTermination").size()}).reset_index()
 
 # MAP
-with open('assets/wojewodztwa-medium.geojson', encoding='utf8') as woj_json:
+with open('assets/wojewodztwa-min.geojson', encoding='utf8') as woj_json:
     wojewodztwa_geo = json.load(woj_json)
 
 
