@@ -22,7 +22,7 @@ def build_map(
                            'terminated', 'all'], sort=True).reset_index()
     voivode_df['TerminatedPercentage'] = voivode_df['terminated'] / \
         voivode_df['all'] * 100.0
-    voivode_df['active'] = (voivode_df['all'] - voivode_df['terminated']).astype(float)
+    voivode_df['active'] = voivode_df['all'] - voivode_df['terminated']
 
     fig = go.Figure()
     if not selceted_voivodeships:

@@ -135,7 +135,7 @@ app.layout = html.Div(
                                           className='fill-height'),
                             ]
                             )
-                ]),
+                ])
         ]
     )
 )
@@ -149,10 +149,6 @@ selceted_voivodeships = []
         Input('map-type-radiobuttons', 'value')
     ])
 def update_map(year, map_type):
-    global global_map_type
-    global_map_type = map_type
-    global global_year
-    global_year = year
     return build_map(year, map_type, surv_df, wojewodztwa_geo, selceted_voivodeships)
 
 @app.callback(
