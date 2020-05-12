@@ -34,14 +34,6 @@ timeline_mock_df = pd.DataFrame({'count': timeline_mock_df.groupby("YearOfTermin
 with open('assets/wojewodztwa-medium.geojson', encoding='utf8') as woj_json:
     wojewodztwa_geo = json.load(woj_json)
 
-with open('assets/powiaty-medium.geojson', encoding='utf8') as pow_json:
-    powiaty_geo = json.load(pow_json)
-
-# map county names to lower
-for feature in powiaty_geo['features']:
-    feature['properties']['nazwa'] = dataset\
-        .replace_polish_chars(str.lower(feature['properties']['nazwa'])\
-                              .lstrip('powiat').strip())
 
 map_type_options = ['Active companies', '% of terminated companies']
 
@@ -100,24 +92,6 @@ app.layout = html.Div(
                                                         }
                                                     )
                                                  ]
-                                                ),
-                                        dbc.Col(md=6,
-                                                className='fill-height',
-                                                children=[
-                                                    html.H5('Partition:'),
-                                                    dcc.RadioItems(
-                                                        id='map-data-radiobuttons',
-                                                        options=[
-                                                            {'label': 'Voivodes', 'value': 0},
-                                                            {'label': 'Counties', 'value': 1}
-                                                        ],
-                                                        value=0,
-                                                        labelStyle={
-                                                            'display': 'inline-block',
-                                                            'padding': 5
-                                                        }
-                                                    )
-                                                    ]
                                                 )
                                     ]
                                 ),
@@ -174,11 +148,10 @@ app.layout = html.Div(
     Output('map', 'figure'),
     [
         Input('year-slider', 'value'),
-        Input('map-type-radiobuttons', 'value'),
-        Input('map-data-radiobuttons', 'value')
+        Input('map-type-radiobuttons', 'value')
     ])
-def update_map(year, map_type, data_type):
-    return build_map(year, map_type, data_type, surv_df, wojewodztwa_geo, powiaty_geo)
+def update_map(year, map_type):
+    return build_map(year, map_type, surv_df, wojewodztwa_geo)
 
 
 @app.callback(

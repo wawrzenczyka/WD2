@@ -5,13 +5,10 @@ import pandas as pd
 def build_map(
         year,
         map_type,
-        data_type,
         surv_df,
-        wojewodztwa_geo,
-        powiaty_geo
+        wojewodztwa_geo
 ):
-    data = {'geojson': wojewodztwa_geo, 'column': 'MainAddressVoivodeship'} \
-        if data_type == 0 else {'geojson': powiaty_geo, 'column': 'MainAddressCounty'}
+    data = {'geojson': wojewodztwa_geo, 'column': 'MainAddressVoivodeship'}
 
     map = {'color': 'active', 'range': (0, 43000)} \
         if map_type == 0 else {'color': 'TerminatedPercentage', 'range': (0, 80)}
