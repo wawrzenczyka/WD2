@@ -4,12 +4,12 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
-import plotly.express as px
 import pandas as pd
 import json
 import dataset
 from treemap_helper import build_pkd_treemap
 from map_helper import build_map
+
 
 surv_df = dataset.load()
 surv_removed_df = surv_df[surv_df['Terminated'] == 1]
@@ -94,7 +94,11 @@ app.layout = html.Div(
                                 ),
                                 dcc.Graph(
                                     id='map',
-                                    className='fill-height'
+                                    className='fill-height',
+                                    config={
+                                        'displayModeBar': False,
+                                        'scrollZoom': False
+                                    },
                                 )]
                             ),
                     dbc.Col(md=6,
