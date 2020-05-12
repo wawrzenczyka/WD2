@@ -26,7 +26,8 @@ voivodeship_select = {
 timeline_mock_df = surv_removed_df[
     (surv_removed_df['MainAddressVoivodeship'] == 'mazowieckie') & (surv_removed_df['PKDMainSection'] == 'G')]
 
-timeline_mock_df = pd.DataFrame({'count': timeline_mock_df.groupby("YearOfTermination").size()}).reset_index()
+timeline_mock_df = pd.DataFrame(
+    {'count': timeline_mock_df.groupby("YearOfTermination").size()}).reset_index()
 
 # MAP
 with open('assets/wojewodztwa-min.geojson', encoding='utf8') as woj_json:
@@ -38,14 +39,6 @@ app = dash.Dash(__name__, external_stylesheets=[
     dbc.themes.BOOTSTRAP,
     './first-tab.css'
 ])
-
-styles = {
-    'pre': {
-        'border': 'thin lightgrey solid',
-        'overflowX': 'scroll'
-    }
-}
-
 
 app.layout = html.Div(
     className='main-wrapper',
@@ -64,7 +57,8 @@ app.layout = html.Div(
                                 max=2020,
                                 step=1,
                                 value=2020,
-                                marks={year: str(year) for year in range(2011, 2021)}
+                                marks={year: str(year)
+                                       for year in range(2011, 2021)}
                             )
                             )
                 ]
@@ -78,8 +72,7 @@ app.layout = html.Div(
                             children=[
                                 dbc.Row(
                                     no_gutters=True,
-                                    children=
-                                    [
+                                    children=[
                                         dbc.Col(md=6,
                                                 className='fill-height',
                                                 children=[
@@ -87,8 +80,10 @@ app.layout = html.Div(
                                                     dcc.RadioItems(
                                                         id='map-type-radiobuttons',
                                                         options=[
-                                                            {'label': 'Active companies', 'value': 0},
-                                                            {'label': '% of terminated companies', 'value': 1}
+                                                            {'label': 'Active companies',
+                                                                'value': 0},
+                                                            {'label': '% of terminated companies',
+                                                                'value': 1}
                                                         ],
                                                         value=0,
                                                         labelStyle={
@@ -102,8 +97,8 @@ app.layout = html.Div(
                                 ),
                                 dcc.Graph(
                                     id='map',
-                                    className='fill-height',
-                                ),                              
+                                    className='fill-height'
+                                ),
                                 html.Div(id="output")
                             ]
                             ),
@@ -132,10 +127,12 @@ app.layout = html.Div(
                             children=[
                                 dcc.Dropdown(
                                     id='voivodeship-input',
-                                    options=[{'label': i, 'value': voivodeship_select[i]} for i in voivodeship_select],
+                                    options=[
+                                        {'label': i, 'value': voivodeship_select[i]} for i in voivodeship_select],
                                     value=None
                                 ),
-                                dcc.Graph(figure=pkd_fig, id='pkd-tree', className='fill-height'),
+                                dcc.Graph(figure=pkd_fig, id='pkd-tree',
+                                          className='fill-height'),
                             ]
                             )
                 ]),
@@ -143,7 +140,7 @@ app.layout = html.Div(
     )
 )
 
-
+selceted_voivodeships = []
 
 @app.callback(
     Output('map', 'figure'),
@@ -152,14 +149,25 @@ app.layout = html.Div(
         Input('map-type-radiobuttons', 'value')
     ])
 def update_map(year, map_type):
-    return build_map(year, map_type, surv_df, wojewodztwa_geo)
+    global global_map_type
+    global_map_type = map_type
+    global global_year
+    global_year = year
+    return build_map(year, map_type, surv_df, wojewodztwa_geo, selceted_voivodeships)
 
 @app.callback(
     Output('output', 'children'),
-    [Input('map', 'clickData')])
+    [Input('map', 'selectedData')]
+)
 def on_map_click(voivodeshipData):
-    #tu robimy sensowne rzeczy po zaznaczeniu województwa
-    return str(voivodeshipData)
+    global selceted_voivodeships
+    if voivodeshipData is None:
+        selceted_voivodeships = []
+        return str(selceted_voivodeships)
+    indices = [item['pointIndex'] for item in voivodeshipData['points']]
+    selceted_voivodeships = indices
+    return str(selceted_voivodeships)
+
 
 @app.callback(
     Output('pkd-tree', 'figure'),
