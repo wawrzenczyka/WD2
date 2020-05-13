@@ -33,19 +33,6 @@ def build_map(
     
     fig = go.Figure(
         [
-            # go.Choroplethmapbox(z = voivode_df[map['color']],
-            #     geojson=data['geojson'],
-            #     locations=voivode_df['index'],
-            #     featureidkey='properties.nazwa',
-                # customdata = df.assign(TerminatedPercentage = df.round(2).TerminatedPercentage.astype(str) + '%')\
-                #     [['voivodeship', 'TerminatedPercentage', 'active']],
-                # hovertemplate = 'Województwo %{customdata[0]}<br>' +
-                #                 'Procent zamkniętych firm: <b>%{customdata[1]}</b><br>' +
-                #                 'Liczba aktywnych firm: <b>%{customdata[2]}</b><br>',
-            #     zmin = map['range'][0],
-            #     zmax = map['range'][1],
-            #     below = True,
-            #     name = ''),
             go.Scattermapbox(
                 lat=df.lat,
                 lon=df.lon,

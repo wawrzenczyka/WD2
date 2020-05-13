@@ -118,14 +118,11 @@ def __format_strings(df_all_trees):
 
     return df_all_trees
 
-def build_pkd_treemap(voivodeship = '', \
-                        county = ''):
+def build_pkd_treemap(voivodeship = []):
     df = __df
 
-    if county is not None and county != '':
-        df = df.loc[df.MainAddressCounty == county, :].reset_index(drop = False)
-    elif voivodeship is not None and voivodeship != '':
-        df = df.loc[df.MainAddressVoivodeship == voivodeship, :].reset_index(drop = False)
+    if voivodeship is not None and voivodeship != []:
+        df = df.loc[np.isin(df.MainAddressVoivodeship, voivodeship), :].reset_index(drop = False)
 
     pkd_names = __pkd_names
     pkd_aggregate = \

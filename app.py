@@ -6,6 +6,7 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 import plotly.express as px
 import pandas as pd
+import numpy as np
 import json
 import dataset
 from treemap_helper import build_pkd_treemap
@@ -134,53 +135,35 @@ app.layout = html.Div(
                 ]),
             html.Div(id='selected-voivodeship', style={'display': 'none'}, children=''),
             html.Div(id='selected-pkd-section', style={'display': 'none'}, children=''),
+            html.Div(id='selected-voivodeship-indices', style={'display': 'none'}, children='')
         ]
     )
 )
-
-selceted_voivodeships = []
 
 @app.callback(
     Output('map', 'figure'),
     [
         Input('year-slider', 'value'),
-        Input('map-type-radiobuttons', 'value')
+        Input('map-type-radiobuttons', 'value'),
+        Input('selected-voivodeship-indices', 'children'),
     ])
-def update_map(year, map_type):
+def update_map(year, map_type, selceted_voivodeships):
     return build_map(year, map_type, surv_df, wojewodztwa_geo, selceted_voivodeships)
-
-@app.callback(
-    Output('output', 'children'),
-    [Input('map', 'selectedData')]
-)
-def on_map_click(voivodeshipData):
-    global selceted_voivodeships
-    if voivodeshipData is None:
-        selceted_voivodeships = []
-        return str(selceted_voivodeships)
-    indices = [item['pointIndex'] for item in voivodeshipData['points']]
-    selceted_voivodeships = indices
-    return str(selceted_voivodeships)
 
 @app.callback(
     [
         Output('selected-voivodeship', 'children'),
+        Output('selected-voivodeship-indices', 'children')
     ],
     [
-        Input('map', 'clickData'),
-    ],
-    [
-        State('selected-voivodeship', 'children')
+        Input('map', 'selectedData')
     ])
-def select_voivodeship(click, old):
-    if click is None:
-        return ['']
-
-    selected_voivodeship = click['points'][0]['location'].upper()
-    if selected_voivodeship == old:
-        return ['']
-    else:
-        return [selected_voivodeship]
+def select_voivodeship(selectedVoivodeship):
+    if selectedVoivodeship is None:
+        return [], []
+    selected_voivodeship = [item['location'].upper() for item in selectedVoivodeship['points']]
+    selected_voivodeship_indices = [item['pointIndex'] for item in selectedVoivodeship['points']]
+    return selected_voivodeship, selected_voivodeship_indices
 
 @app.callback(
     [
@@ -243,8 +226,8 @@ def redraw_treemap(voivodeship):
 def redraw_timeline(voivodeship, pkd_section):
     data = surv_removed_df
 
-    if voivodeship != '':
-        data = data[data['MainAddressVoivodeship'] == voivodeship.lower()]
+    if voivodeship != []:
+        data = data[np.isin(data['MainAddressVoivodeship'], [voiv.lower() for voiv in voivodeship])]
     if pkd_section != '':
         if pkd_section.isalpha():
             # section (eg. A, B, C...)
