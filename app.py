@@ -191,13 +191,17 @@ def select_pkd_section(click, mapClick, old):
     parent = click['points'][0]['parent']
 
     if 'entry' in click['points'][0] and label == click['points'][0]['entry']:
-        # zooming in
+        # zooming out
         if parent == 'Wszystkie sekcje PKD':
             selected_section = ''
         else:
-            selected_section = parent.split(' ')[1]
+            if label == 'Wszystkie sekcje PKD':
+                # you are in root and click root
+                selected_section = ''
+            else:
+                selected_section = parent.split(' ')[1]
     else:
-        # zooming out
+        # zooming in
         if label == 'Wszystkie sekcje PKD':
             selected_section = ''
         else:
