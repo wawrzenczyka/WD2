@@ -2,6 +2,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 
+voivodeship_lat_lon_data = pd.read_csv('voi_lat_lon.csv', encoding = 'UTF-8')
 
 def build_map(
         year,
@@ -24,24 +25,85 @@ def build_map(
         voivode_df['all'] * 100.0
     voivode_df['active'] = voivode_df['all'] - voivode_df['terminated']
 
-    fig = go.Figure()
+
+    df = voivode_df.merge(voivodeship_lat_lon_data,
+        left_on = 'index',
+        right_on = 'voivodeship'
+    )
+    
+    fig = go.Figure(
+        [
+            # go.Choroplethmapbox(z = voivode_df[map['color']],
+            #     geojson=data['geojson'],
+            #     locations=voivode_df['index'],
+            #     featureidkey='properties.nazwa',
+                # customdata = df.assign(TerminatedPercentage = df.round(2).TerminatedPercentage.astype(str) + '%')\
+                #     [['voivodeship', 'TerminatedPercentage', 'active']],
+                # hovertemplate = 'Województwo %{customdata[0]}<br>' +
+                #                 'Procent zamkniętych firm: <b>%{customdata[1]}</b><br>' +
+                #                 'Liczba aktywnych firm: <b>%{customdata[2]}</b><br>',
+            #     zmin = map['range'][0],
+            #     zmax = map['range'][1],
+            #     below = True,
+            #     name = ''),
+            go.Scattermapbox(
+                lat=df.lat,
+                lon=df.lon,
+                mode='text',
+                text=df.round(2).TerminatedPercentage.astype(str) + '%',
+                textfont = {
+                    "color": "black",
+                    "family": "Verdana, sans-serif",
+                    "size": 12,
+                },
+                name = '',
+                showlegend= False,
+                hoverinfo='skip',
+            )
+        ]
+    )
+
+    customdata = df.assign(TerminatedPercentage = df.round(2).TerminatedPercentage.astype(str) + '%')\
+                    [['voivodeship', 'TerminatedPercentage', 'active']]
+    hovertemplate = 'Województwo %{customdata[0]}<br>' + \
+                    'Procent zamkniętych firm: <b>%{customdata[1]}</b><br>' + \
+                    'Liczba aktywnych firm: <b>%{customdata[2]}</b><br>'
+
     if not selceted_voivodeships:
-        fig.add_choroplethmapbox(autocolorscale=True, geojson=data['geojson'], customdata=voivode_df, locations=voivode_df['index'],
-                                z=voivode_df[map['color']], zmax=map['max'], zmin=0.0, featureidkey="properties.nazwa",
-                                showscale=True, hoverinfo='location', marker={'opacity': 0.5})
+        fig.add_choroplethmapbox(autocolorscale=True, geojson=data['geojson'], customdata=customdata, hovertemplate=hovertemplate, 
+                                locations=voivode_df['index'], z=voivode_df[map['color']], zmax=map['max'], zmin=0.0, 
+                                featureidkey="properties.nazwa",
+                                showscale=True, marker={'opacity': 0.5}, name='')
     else:
-        fig.add_choroplethmapbox(autocolorscale=True, geojson=data['geojson'], customdata=voivode_df, locations=voivode_df['index'],
-                                z=voivode_df[map['color']], zmax=map['max'], marker={'opacity': 0.5}, zmin=0.0, featureidkey="properties.nazwa",
-                                showscale=True, hoverinfo='location', selected={'marker': {'opacity': 0.8}}, 
+        fig.add_choroplethmapbox(autocolorscale=True, geojson=data['geojson'], customdata=customdata, hovertemplate=hovertemplate, 
+                                locations=voivode_df['index'], z=voivode_df[map['color']], zmax=map['max'], marker={'opacity': 0.5}, 
+                                zmin=0.0, featureidkey="properties.nazwa", name='',
+                                showscale=True, selected={'marker': {'opacity': 0.8}}, 
                                 unselected={'marker': {'opacity': 0.2}},
                                 selectedpoints=selceted_voivodeships)
 
     fig.update_layout(
-        mapbox_style="white-bg",
-        mapbox_center={"lat": 52.10, "lon": 19.42},
-        mapbox_zoom=5,
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
+        mapbox=dict(
+            accesstoken='pk.eyJ1Ijoid2QydGVhbSIsImEiOiJja2E0MjMyNDcwcHliM2VvZ25ycTV4MTBuIn0.7pvFq64tRzS_FgMCGcBljQ',
+            bearing=0,
+            center=go.layout.mapbox.Center(
+                lat=52.10,
+                lon=19.42
+            ),
+            pitch=0,
+            zoom=5.1
+            # style="white-bg"
+        ), 
         clickmode='event+select'
     )
+
+    # fig.update_layout(
+    #     mapbox_style="white-bg",
+    #     mapbox_center={"lat": 52.10, "lon": 19.42},
+    #     mapbox_zoom=5,
+    #     margin={"r": 0, "t": 0, "l": 0, "b": 0},
+    #     clickmode='event+select'
+    # )
 
     return fig
