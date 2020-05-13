@@ -12,6 +12,8 @@ import ceidg_dataset
 from treemap_helper import build_pkd_treemap
 from map_helper import build_map
 import event_timeline
+import os
+THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
 
 surv_df = ceidg_dataset.load()
@@ -29,7 +31,7 @@ timeline_mock_df = pd.DataFrame(
     {'count': timeline_mock_df.groupby("YearOfTermination").size()}).reset_index()
 
 # MAP
-with open('assets/wojewodztwa-min.geojson', encoding='utf8') as woj_json:
+with open(os.path.join(THIS_FOLDER, 'assets', 'wojewodztwa-min.geojson'), encoding='utf8') as woj_json:
     wojewodztwa_geo = json.load(woj_json)
 
 map_type_options = ['Active companies', '% of terminated companies']
