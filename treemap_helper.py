@@ -1,9 +1,11 @@
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
+import os
+THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
-__df = pd.read_csv('ceidg_data_surv.csv').dropna()
-__pkd_data = pd.read_csv('pkd.csv', sep = ';', encoding = 'UTF-8')
+__df = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'ceidg_data_surv.csv')).dropna()
+__pkd_data = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'pkd.csv'), sep = ';', encoding = 'UTF-8')
 __pkd_data['typ'] = \
     np.where(__pkd_data.symbol.str.match(r'^[A-Z]+$'),
         'PKDMainSection', \

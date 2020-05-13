@@ -2,8 +2,10 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
+import os
+THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
-voivodeship_lat_lon_data = pd.read_csv('assets/voi_lon_lat.csv', encoding = 'UTF-8')
+voivodeship_lat_lon_data = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'voi_lon_lat.csv'), encoding = 'UTF-8')
 
 def build_map(
         year,

@@ -1,13 +1,14 @@
 import pandas as pd
 import os
+THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
 
 def load_raw():
-    return pd.read_csv('ceidg_data_surv.csv', encoding="utf-8")
+    return pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'ceidg_data_surv.csv'), encoding="utf-8")
 
 
 def load():
-    dfpath = './ceidg_data_surv_formatted.csv'
+    dfpath = os.path.join(THIS_FOLDER, 'data', 'ceidg_data_surv_formatted.csv')
     if os.path.isfile(dfpath):
         return pd.read_csv(dfpath, encoding="utf-8")
     else:
