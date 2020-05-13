@@ -8,13 +8,13 @@ import plotly.express as px
 import pandas as pd
 import numpy as np
 import json
-import dataset
+import ceidg_dataset
 from treemap_helper import build_pkd_treemap
 from map_helper import build_map
 import event_timeline
 
 
-surv_df = dataset.load()
+surv_df = ceidg_dataset.load()
 surv_removed_df = surv_df[surv_df['Terminated'] == 1]
 
 # Global first-page variables
