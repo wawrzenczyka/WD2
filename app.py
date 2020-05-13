@@ -11,6 +11,7 @@ import json
 import dataset
 from treemap_helper import build_pkd_treemap
 from map_helper import build_map
+import event_timeline
 
 
 surv_df = dataset.load()
@@ -112,13 +113,6 @@ app.layout = html.Div(
                                 dcc.Graph(
                                     className='fill-height',
                                     id='timeline',
-                                    responsive=False,
-                                    figure={
-                                        'data': [dict(
-                                            x=timeline_mock_df['YearOfTermination'],
-                                            y=timeline_mock_df['count']
-                                        )]
-                                    }
                                 )
                             ]
                             )
@@ -241,12 +235,8 @@ def redraw_timeline(voivodeship, pkd_section):
             data = data[data['PKDMainDivision'] == float(pkd_section)]
 
     data = pd.DataFrame({'count': data.groupby("YearOfTermination").size()}).reset_index()
-    return  [{
-                'data': [dict(
-                    x=data['YearOfTermination'],
-                    y=data['count']
-                )]
-            }]
+    return [event_timeline.build_event_timeline(data)]
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
