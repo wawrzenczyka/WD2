@@ -2,7 +2,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 
-voivodeship_lat_lon_data = pd.read_csv('voi_lat_lon.csv', encoding = 'UTF-8')
+voivodeship_lat_lon_data = pd.read_csv('assets/voi_lon_lat.csv', encoding = 'UTF-8')
 
 def build_map(
         year,
@@ -30,14 +30,16 @@ def build_map(
         left_on = 'index',
         right_on = 'voivodeship'
     )
-    
+
+    label_text = df.round(2).TerminatedPercentage.astype(str) + '%' if map['color']=='TerminatedPercentage' else df.active.astype(str)
+
     fig = go.Figure(
         [
             go.Scattermapbox(
                 lat=df.lat,
                 lon=df.lon,
                 mode='text',
-                text=df.round(2).TerminatedPercentage.astype(str) + '%',
+                text=label_text,
                 textfont = {
                     "color": "black",
                     "family": "Verdana, sans-serif",
