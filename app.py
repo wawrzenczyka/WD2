@@ -2,10 +2,21 @@
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_bootstrap_components as dbc
+import dash_daq as daq
+from dash.dependencies import Input, Output, State
+import plotly.express as px
 import pandas as pd
 import numpy as np
+import json
+import ceidg_dataset
+from treemap_helper import build_pkd_treemap
+from map_helper import build_map
+import event_timeline
+import os
 from joblib import load
-from dash.dependencies import Input, Output
+
+THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
 BUISSNES_MAPPING = [
     {'label': 'studio fizjoterapeutyczne', 'value': 'Q_86'},
@@ -30,111 +41,353 @@ VOIVODESHIPS_MAPPING = [
     {'label': '', 'value': 'na'},
 ]
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
+# LOAD DATA
+surv_df = ceidg_dataset.load()
+surv_removed_df = surv_df[surv_df['Terminated'] == 1]
+
+
+# Global first-page variables
+voivodeship = ''
+pkd_section = ''
+
+
+# TIMELINE DATA
+timeline_mock_df = surv_removed_df[
+    (surv_removed_df['MainAddressVoivodeship'] == 'mazowieckie') & (surv_removed_df['PKDMainSection'] == 'G')]
+
+timeline_mock_df = pd.DataFrame(
+    {'count': timeline_mock_df.groupby("YearOfTermination").size()}).reset_index()
+
+
+# MAP
+with open(os.path.join(THIS_FOLDER, 'assets', 'wojewodztwa-min.geojson'), encoding='utf8') as woj_json:
+    wojewodztwa_geo = json.load(woj_json)
+
+map_type_options = ['Active companies', '% of terminated companies']
+
+
+# Treemap init
+pkd_fig = build_pkd_treemap()
+
+app = dash.Dash(__name__, external_stylesheets=[
+    dbc.themes.BOOTSTRAP,
+    './first-tab.css'
+])
+
+# PREDICTION MODEL
 clf = load('model.joblib')
 
-app.layout = html.Div(children=[
-    html.H1(children='Ile przetrwa twój biznes?', style={'font-weight': 'bold'}),
-
-    html.Plaintext("Jestem ", style={'display':'inline-block', 'font-size': '12pt'}),
-    dcc.Dropdown(
-        id='sex',
-        options=SEX_MAPPING,
-        value='M',
-        style=dict(
-            width=100,
-            display='inline-block',
-            verticalAlign="middle"
-        )
-    ),
-
-    html.Plaintext(", mam ", style={'display':'inline-block', 'font-size': '12pt'}),
-    dcc.Dropdown(
-        id='business-type',
-        options=BUISSNES_MAPPING,
-        value='Q_86',
-        style=dict(
-            width=210,
-            display='inline-block',
-            verticalAlign="middle"
-        )
-    ),
-
-    html.Plaintext(", jestem z województwa ", style={'display':'inline-block', 'font-size': '12pt'}),
-    dcc.Dropdown(
-        id='voivodeship',
-        options=VOIVODESHIPS_MAPPING,
-        value='mazowieckie',
-        style=dict(
-            width=190,
-            display='inline-block',
-            verticalAlign="middle"
-        )
-    ),
-
-    html.Div([
-        html.Plaintext(" i ", style={'display':'inline-block', 'font-size': '12pt'}),
-
-        dcc.Dropdown(
-            id='is_licence',
-            options=[
-                {'label': 'mam licencje', 'value': 1},
-                {'label': 'nie mam licencji', 'value': 0},
-            ],
-            value=0,
-            style=dict(
-                width=135,
-                display='inline-block',
-                verticalAlign="middle",
-                padding='0',
-            )
+app.layout = html.Div(
+    className='main-wrapper',
+    children=[
+        html.Div(
+            className='section',
+            children=[
+                dbc.Row(
+                    children=[
+                        dbc.Col(md=2,
+                                children=html.H3("Year:")
+                                ),
+                        dbc.Col(md=2,
+                                children=daq.Slider(
+                                    color="default",
+                                    id='year-slider',
+                                    min=2011,
+                                    max=2020,
+                                    step=0.5,
+                                    value=2020,
+                                    size=1000,
+                                    marks={year + 0.01: str(int(year))
+                                           for year in range(2011, 2021)},
+                                    targets=event_timeline.EVENTS_SLIDER,
+                                ),
+                                )
+                    ]
+                ),
+                dbc.Row(
+                    className='top',
+                    no_gutters=True,
+                    children=[
+                        dbc.Col(md=6,
+                                className='box',
+                                children=[
+                                    dbc.Row(
+                                        no_gutters=True,
+                                        children=[
+                                            dbc.Col(md=6,
+                                                    className='fill-height',
+                                                    children=[
+                                                        html.H5('Filter:'),
+                                                        dcc.RadioItems(
+                                                            id='map-type-radiobuttons',
+                                                            options=[
+                                                                {'label': 'Active companies',
+                                                                 'value': 0},
+                                                                {'label': '% of terminated companies',
+                                                                 'value': 1}
+                                                            ],
+                                                            value=0,
+                                                            labelStyle={
+                                                                'display': 'inline-block',
+                                                                'padding': 5
+                                                            }
+                                                        )
+                                                    ]
+                                                    )
+                                        ]
+                                    ),
+                                    dcc.Graph(
+                                        id='map',
+                                        className='fill-height',
+                                        config={
+                                            'displayModeBar': False,
+                                            'scrollZoom': False
+                                        },
+                                    ),
+                                    html.Div(id="output")
+                                ]
+                                ),
+                        dbc.Col(md=6,
+                                className='box',
+                                children=[
+                                    dcc.Graph(
+                                        className='fill-height',
+                                        id='timeline',
+                                    )
+                                ]
+                                )
+                    ]),
+                dbc.Row(
+                    className='bottom',
+                    no_gutters=True,
+                    children=[
+                        dbc.Col(md=12,
+                                children=[
+                                    dcc.Graph(figure=pkd_fig, id='pkd-tree', className='fill-height'),
+                                ]
+                                )
+                    ]),
+                html.Div(id='selected-voivodeship', style={'display': 'none'}, children=''),
+                html.Div(id='selected-pkd-section', style={'display': 'none'}, children=''),
+                html.Div(id='selected-voivodeship-indices', style={'display': 'none'}, children='')
+            ]
         ),
-    ], id='to_hide', style={'display': 'inline-block'},
+        html.Div(
+            id='prediction',
+            style={'text-align': 'center'},
+            children=[
+                html.H1(children='Ile przetrwa twój biznes?', style={'font-weight': 'bold'}),
 
-    ),
+                html.Plaintext("Jestem ", style={'display': 'inline-block', 'font-size': '12pt'}),
+                dcc.Dropdown(
+                    id='sex',
+                    options=SEX_MAPPING,
+                    value='M',
+                    style=dict(
+                        width=100,
+                        display='inline-block',
+                        verticalAlign="middle"
+                    )
+                ),
 
+                html.Plaintext(", mam ", style={'display': 'inline-block', 'font-size': '12pt'}),
+                dcc.Dropdown(
+                    id='business-type',
+                    options=BUISSNES_MAPPING,
+                    value='Q_86',
+                    style=dict(
+                        width=210,
+                        display='inline-block',
+                        verticalAlign="middle"
+                    )
+                ),
 
-    html.Plaintext(". ", style={'display':'inline-block', 'font-size': '12pt'}),
-    dcc.Dropdown(
-        id='is_shareholder',
-        options=[
-            {'label': 'Posiadam udziały', 'value': 1},
-            {'label': 'Nie posiadam udziałów', 'value': 0},
-        ],
-        value=0,
-        style=dict(
-            width=185,
-            display='inline-block',
-            verticalAlign="middle",
-            padding='0',
+                html.Plaintext(", jestem z województwa ", style={'display': 'inline-block', 'font-size': '12pt'}),
+                dcc.Dropdown(
+                    id='voivodeship',
+                    options=VOIVODESHIPS_MAPPING,
+                    value='mazowieckie',
+                    style=dict(
+                        width=190,
+                        display='inline-block',
+                        verticalAlign="middle"
+                    )
+                ),
+
+                html.Div([
+                    html.Plaintext(" i ", style={'display': 'inline-block', 'font-size': '12pt'}),
+
+                    dcc.Dropdown(
+                        id='is_licence',
+                        options=[
+                            {'label': 'mam licencje', 'value': 1},
+                            {'label': 'nie mam licencji', 'value': 0},
+                        ],
+                        value=0,
+                        style=dict(
+                            width=135,
+                            display='inline-block',
+                            verticalAlign="middle",
+                            padding='0',
+                        )
+                    ),
+                ], id='to_hide', style={'display': 'inline-block'},
+
+                ),
+
+                html.Plaintext(". ", style={'display': 'inline-block', 'font-size': '12pt'}),
+                dcc.Dropdown(
+                    id='is_shareholder',
+                    options=[
+                        {'label': 'Posiadam udziały', 'value': 1},
+                        {'label': 'Nie posiadam udziałów', 'value': 0},
+                    ],
+                    value=0,
+                    style=dict(
+                        width=185,
+                        display='inline-block',
+                        verticalAlign="middle",
+                        padding='0',
+                    )
+                ),
+                html.Plaintext(" w innych firmach. ", style={'display': 'inline-block', 'font-size': '12pt'}),
+
+                html.Div([
+                    html.Plaintext("Mój e-mail to ", style={'display': 'inline-block', 'font-size': '12pt'}),
+                    dcc.Input(id="email", type="text", value="", placeholder="",
+                              style=dict(display='inline-block')),
+                    html.Plaintext(", mój numer telefonu to ", style={'display': 'inline-block', 'font-size': '12pt'}),
+                    dcc.Input(id="phone_number", type="text", value="",
+                              placeholder="", style=dict(display='inline-block')),
+                    html.Plaintext(". ", style={'display': 'inline-block', 'font-size': '12pt'}),
+                ]),
+
+                html.Plaintext("Twoja firma przetrwa", style={
+                    'display': 'block', 'text-align': 'center', 'font-size': '14pt', 'margin-top': '100px',
+                    'margin-bottom': '0px'}),
+                html.Div(id="prediction-output"),
+
+                html.Hr(),
+
+                dcc.Graph(id='bankrupcy_proba-graph')
+            ]
         )
-    ),
-    html.Plaintext(" w innych firmach. ", style={'display':'inline-block', 'font-size': '12pt'}),
-
-    html.Div([
-        html.Plaintext("Mój e-mail to ", style={'display':'inline-block', 'font-size': '12pt'}),
-        dcc.Input(id="email", type="text", value="", placeholder="",
-                  style=dict(display='inline-block')),
-        html.Plaintext(", mój numer telefonu to ", style={'display':'inline-block', 'font-size': '12pt'}),
-        dcc.Input(id="phone_number", type="text", value="",
-                  placeholder="", style=dict(display='inline-block')),
-        html.Plaintext(". ", style={'display':'inline-block', 'font-size': '12pt'}),
-    ]),
+    ]
+)
 
 
-    html.Plaintext("Twoja firma przetrwa", style={
-                   'display': 'block', 'text-align': 'center', 'font-size': '14pt', 'margin-top': '100px', 'margin-bottom': '0px'}),
-    html.Div(id="output"),
+@app.callback(
+    Output('map', 'figure'),
+    [
+        Input('year-slider', 'value'),
+        Input('map-type-radiobuttons', 'value'),
+        Input('selected-voivodeship-indices', 'children'),
+    ])
+def update_map(year, map_type, selceted_voivodeships):
+    return build_map(int(year), map_type, surv_df, wojewodztwa_geo, selceted_voivodeships)
 
-    html.Hr(),
 
-    dcc.Graph(id='bankrupcy_proba-graph')
+@app.callback(
+    [
+        Output('selected-voivodeship', 'children'),
+        Output('selected-voivodeship-indices', 'children')
+    ],
+    [
+        Input('map', 'selectedData')
+    ])
+def select_voivodeship(selectedVoivodeship):
+    if selectedVoivodeship is None:
+        return [], []
+    selected_voivodeship = [item['location'].upper() for item in selectedVoivodeship['points']]
+    selected_voivodeship_indices = [item['pointIndex'] for item in selectedVoivodeship['points']]
+    return selected_voivodeship, selected_voivodeship_indices
 
-], style={'text-align': 'center'})
+
+@app.callback(
+    [
+        Output('selected-pkd-section', 'children'),
+    ],
+    [
+        Input('pkd-tree', 'clickData'),
+        Input('map', 'clickData'),
+    ],
+    [
+        State('selected-pkd-section', 'children')
+    ])
+def select_pkd_section(click, mapClick, old):
+    ctx = dash.callback_context
+    clicked = ctx.triggered[0]['prop_id'].split('.')[0]
+    if clicked == 'map':
+        # on voivodeship change
+        return ['']
+
+    if click is None:
+        # on startup
+        return ['']
+
+    label = click['points'][0]['label']
+    parent = click['points'][0]['parent']
+
+    if 'entry' in click['points'][0] and label == click['points'][0]['entry']:
+        # zooming out
+        if parent == 'Wszystkie sekcje PKD':
+            selected_section = ''
+        else:
+            if label == 'Wszystkie sekcje PKD':
+                # you are in root and click root
+                selected_section = ''
+            else:
+                selected_section = parent.split(' ')[1]
+    else:
+        # zooming in
+        if label == 'Wszystkie sekcje PKD':
+            selected_section = ''
+        else:
+            selected_section = click['points'][0]['label'].split(' ')[1]
+
+    return [selected_section]
 
 
+@app.callback(
+    [
+        Output('pkd-tree', 'figure'),
+    ],
+    [
+        Input('selected-voivodeship', 'children'),
+    ])
+def redraw_treemap(voivodeship):
+    return build_pkd_treemap(voivodeship=voivodeship),
+
+
+@app.callback(
+    [
+        Output('timeline', 'figure'),
+    ],
+    [
+        Input('year-slider', 'value'),
+        Input('selected-voivodeship', 'children'),
+        Input('selected-pkd-section', 'children'),
+    ])
+def redraw_timeline(year, voivodeship, pkd_section):
+    data = surv_removed_df
+
+    if voivodeship != []:
+        data = data[np.isin(data['MainAddressVoivodeship'], [voiv.lower() for voiv in voivodeship])]
+    if pkd_section != '':
+        if pkd_section.isalpha():
+            # section (eg. A, B, C...)
+            data = data[data['PKDMainSection'] == pkd_section]
+        else:
+            # division (eg. 47)
+            data = data[data['PKDMainDivision'] == float(pkd_section)]
+
+    data = pd.DataFrame({'count': data.groupby("YearOfTermination").size()}).reset_index()
+    return [event_timeline.build_event_timeline(data, year)]
+
+
+# PREDICTION CALLBACKS
 @app.callback(
     Output(component_id='to_hide', component_property='style'),
     [Input(component_id='business-type', component_property='value')])
@@ -146,15 +399,15 @@ def show_hide_element(visibility_state):
 
 
 @app.callback(
-    [Output(component_id='output', component_property='children'),
-     Output('output', 'style')],
+    [Output(component_id='prediction-output', component_property='children'),
+     Output('prediction-output', 'style')],
     [Input(component_id='sex', component_property='value'),
-        Input(component_id='business-type', component_property='value'),
-        Input(component_id='voivodeship', component_property='value'),
-        Input(component_id='is_licence', component_property='value'),
-        Input(component_id='is_shareholder', component_property='value'),
-        Input(component_id='email', component_property='value'),
-        Input(component_id='phone_number', component_property='value')]
+     Input(component_id='business-type', component_property='value'),
+     Input(component_id='voivodeship', component_property='value'),
+     Input(component_id='is_licence', component_property='value'),
+     Input(component_id='is_shareholder', component_property='value'),
+     Input(component_id='email', component_property='value'),
+     Input(component_id='phone_number', component_property='value')]
 )
 def predict(sex, PKD_Div_Sec, voivodeship, licence, shareholder, email, phone_number):
     X = {'HasLicences': [licence > 0], 'PKDMainDivision': [PKD_Div_Sec.split('_')[1]],
