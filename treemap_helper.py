@@ -2,22 +2,24 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import os
+
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
 __df = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'ceidg_data_surv.csv')).dropna()
-__pkd_data = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'pkd.csv'), sep = ';', encoding = 'UTF-8')
+__pkd_data = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'pkd.csv'), sep=';', encoding='UTF-8')
 __pkd_data['typ'] = \
     np.where(__pkd_data.symbol.str.match(r'^[A-Z]+$'),
-        'PKDMainSection', \
-        np.where(__pkd_data.symbol.str.match(r'^[0-9]+$'),
-            'PKDMainDivision', \
-            np.where(__pkd_data.symbol.str.match(r'^[0-9]+.[0-9]$'),
-                'PKDMainGroup', \
-                'PKDMainClass')
-        ))
+             'PKDMainSection', \
+             np.where(__pkd_data.symbol.str.match(r'^[0-9]+$'),
+                      'PKDMainDivision', \
+                      np.where(__pkd_data.symbol.str.match(r'^[0-9]+.[0-9]$'),
+                               'PKDMainGroup', \
+                               'PKDMainClass')
+                      ))
 __pkd_data['symbol'] = __pkd_data.symbol.str.replace(r'^0+', '').str.replace(r'\.', '')
-__pkd_names = __pkd_data.loc[~__pkd_data.symbol.str.contains('([0-9]+)[A-Z]$'), :]\
+__pkd_names = __pkd_data.loc[~__pkd_data.symbol.str.contains('([0-9]+)[A-Z]$'), :] \
     [['symbol', 'nazwa', 'typ']]
+
 
 def __build_hierarchical_dataframe(df, pkd_names, levels, value_column, color_columns=None):
     """
@@ -29,57 +31,58 @@ def __build_hierarchical_dataframe(df, pkd_names, levels, value_column, color_co
     df_all_trees = pd.DataFrame(columns=['id', 'parent', 'value', 'color'])
     for i, level in enumerate(levels):
         df_tree = pd.DataFrame(columns=['id', 'parent', 'value', 'color'])
-        dfg = df.groupby(levels[:i+1]).sum()
+        dfg = df.groupby(levels[:i + 1]).sum()
         dfg = dfg.reset_index()
         df_tree['id'] = dfg[level].copy()
         df_tree.id = df_tree.id.astype(str).str.replace(r'\.[0-9]*', '')
-        df_tree = df_tree.merge(pkd_names\
-                .loc[pkd_names.typ == level],
-            left_on = 'id',
-            right_on = 'symbol'
-        )
+        df_tree = df_tree.merge(pkd_names \
+                                .loc[pkd_names.typ == level],
+                                left_on='id',
+                                right_on='symbol'
+                                )
         if i > 0:
-            df_tree['parent'] = dfg[levels[i-1]].copy()
+            df_tree['parent'] = dfg[levels[i - 1]].copy()
         else:
             df_tree['parent'] = 'Wszystkie sekcje PKD'
         df_tree['value'] = dfg[value_column]
-        df_tree['color'] = df.groupby(levels[:i+1]).median().reset_index()[color_columns[0]]
+        df_tree['color'] = df.groupby(levels[:i + 1]).median().reset_index()[color_columns[0]]
         df_all_trees = df_all_trees.append(df_tree, ignore_index=True)
     total = pd.Series(dict(id='Wszystkie sekcje PKD', parent='',
-                            value=df[value_column].sum(),
-                            color=df[color_columns[0]].median(),
-                            nazwa=''))
+                           value=df[value_column].sum(),
+                           color=df[color_columns[0]].median(),
+                           nazwa=''))
     df_all_trees = df_all_trees.append(total, ignore_index=True)
     return df_all_trees
 
+
 def __format_strings(df_all_trees):
-    df_all_trees = df_all_trees\
-        .assign(years = df_all_trees.color // 12,
-                months = df_all_trees.color % 12)
-    df_all_trees = df_all_trees\
-        .assign(\
-            years = np.where(df_all_trees.years == 0,
-                '',
-                np.where(np.isin(df_all_trees.years, [1]),
-                    '1 rok',
-                    np.where(np.isin(df_all_trees.years, [2, 3, 4]),
-                        df_all_trees.years.astype(int).astype(str) + ' lata',
-                        df_all_trees.years.astype(int).astype(str) + ' lat')
-                )
-            ),
-            months = np.where(df_all_trees.months == 0,
-                '',
-                np.where(np.isin(df_all_trees.months, [1]),
-                    ', 1 miesiąc',
-                    np.where(np.isin(df_all_trees.months, [2, 3, 4]),
-                        ', ' + df_all_trees.months.astype(int).astype(str) + ' miesiące',
-                        ', ' + df_all_trees.months.astype(int).astype(str) + ' miesięcy')
-                )
-            )
-        )
+    df_all_trees = df_all_trees \
+        .assign(years=df_all_trees.color // 12,
+                months=df_all_trees.color % 12)
+    df_all_trees = df_all_trees \
+        .assign( \
+        years=np.where(df_all_trees.years == 0,
+                       '',
+                       np.where(np.isin(df_all_trees.years, [1]),
+                                '1 rok',
+                                np.where(np.isin(df_all_trees.years, [2, 3, 4]),
+                                         df_all_trees.years.astype(int).astype(str) + ' lata',
+                                         df_all_trees.years.astype(int).astype(str) + ' lat')
+                                )
+                       ),
+        months=np.where(df_all_trees.months == 0,
+                        '',
+                        np.where(np.isin(df_all_trees.months, [1]),
+                                 ', 1 miesiąc',
+                                 np.where(np.isin(df_all_trees.months, [2, 3, 4]),
+                                          ', ' + df_all_trees.months.astype(int).astype(str) + ' miesiące',
+                                          ', ' + df_all_trees.months.astype(int).astype(str) + ' miesięcy')
+                                 )
+                        )
+    )
 
     df_all_trees = df_all_trees.assign(
-        id = np.where(
+        id=np.where(
             df_all_trees.typ == 'PKDMainSection',
             'Sekcja ',
             np.where(
@@ -99,7 +102,7 @@ def __format_strings(df_all_trees):
     )
 
     df_all_trees = df_all_trees.assign(
-        parent = np.where(
+        parent=np.where(
             df_all_trees.typ == 'PKDMainDivision',
             'Sekcja ',
             np.where(
@@ -120,18 +123,19 @@ def __format_strings(df_all_trees):
 
     return df_all_trees
 
-def build_pkd_treemap(voivodeship = []):
+
+def build_pkd_treemap(voivodeship=[]):
     df = __df
 
     if voivodeship is not None and voivodeship != []:
-        df = df.loc[np.isin(df.MainAddressVoivodeship, voivodeship), :].reset_index(drop = False)
+        df = df.loc[np.isin(df.MainAddressVoivodeship, voivodeship), :].reset_index(drop=False)
 
     pkd_names = __pkd_names
     pkd_aggregate = \
-        df.assign(ones = 1)
+        df.assign(ones=1)
 
     levels = ['PKDMainSection',
-            'PKDMainDivision'] # levels used for the hierarchical chart
+              'PKDMainDivision']  # levels used for the hierarchical chart
     color_columns = ['DurationOfExistenceInMonths']
     value_column = 'ones'
 
@@ -153,16 +157,16 @@ def build_pkd_treemap(voivodeship = []):
             colorscale='balance',
             cmax=max_duration,
             cmid=median_duration,
-            colorbar=dict(thickness=20, title='Przetrwane miesiące', titleside = 'right')),
+            colorbar=dict(thickness=20, title='Przetrwane miesiące', titleside='right')),
         maxdepth=2,
         # texttemplate = "%{label}<br>%<b>%{customdata[2]}<\b><br>",
-        customdata = df_all_trees[['years', 'months', 'nazwa']],
+        customdata=df_all_trees[['years', 'months', 'nazwa']],
         hovertemplate='<b>%{label} </b> <br>%{customdata[2]} <br> - Liczba firm: %{value}<br> - Czas życia przeciętnej firmy: <b>%{customdata[0]}%{customdata[1]}</b>',
         name=''
     ))
 
     pkd_fig.update_layout(
-        title = {
+        title={
             'text': "Czas życia przeciętnej firmy",
             'y': 0.9,
             'x': 0.5,
