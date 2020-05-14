@@ -1,0 +1,41 @@
+.left {
+  background: grey;
+}
+
+.right {
+  background: black;
+}
+
+.main-wrapper {
+  height: 100vh;
+}
+
+.section {
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.top {
+  background: #f9f9f9;
+  height: 65%;
+  width: 100%;
+}
+.bottom {
+  height: 35%;
+  background: #f9f9f9;
+  width: 100%;
+}
+
+.fill-height{
+ flex: 1 1 auto;
+}
+
+.box {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
