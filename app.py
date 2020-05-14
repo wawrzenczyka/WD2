@@ -5,11 +5,9 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 import dash_daq as daq
 from dash.dependencies import Input, Output, State
-import plotly.express as px
 import pandas as pd
 import numpy as np
 import json
-import ceidg_dataset
 from treemap_helper import build_pkd_treemap
 from map_helper import build_map
 import event_timeline
@@ -17,7 +15,7 @@ import os
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
 
-surv_df = ceidg_dataset.load()
+surv_df = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'ceidg_data_formated.csv'), encoding="utf-8")
 surv_removed_df = surv_df[surv_df['Terminated'] == 1]
 
 # Global first-page variables
