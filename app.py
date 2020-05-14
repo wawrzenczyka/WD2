@@ -50,24 +50,50 @@ app.layout = html.Div(
         className='section',
         children=[
             dbc.Row(
+                justify="center",
+                align="center",
                 children=[
-                    dbc.Col(md=2,
-                            children=html.H3("Year:")
-                            ),
-                    dbc.Col(md=2,
-                            children=daq.Slider(
-                                color="default",
-                                id='year-slider',
-                                min=2011,
-                                max=2020,
-                                step=0.5,
-                                value=2020,
-                                size=1000,
-                                marks={year+0.01: str(int(year))
-                                       for year in range(2011, 2021)},
-                                targets=event_timeline.EVENTS_SLIDER,
-                            ),
-                            )
+                    html.A(
+                        id="flexi_form_start",
+                        href="javascript:introJs().start();",
+                        children="Start tour",
+                        style={
+                            'text-size': '40pt',
+                            'padding-bottom': '40px'
+                        }
+                    )
+                ]
+            ),
+            dbc.Row(
+                children=[
+                    html.Div(
+                        children=dbc.Row(
+                            children=[
+                                dbc.Col(md=2,
+                                        children=html.H3("Year:")
+                                        ),
+                                dbc.Col(md=2,
+                                        children=daq.Slider(
+                                            color="default",
+                                            id='year-slider',
+                                            min=2011,
+                                            max=2020,
+                                            step=0.5,
+                                            value=2020,
+                                            size=1000,
+                                            marks={year+0.01: str(int(year))
+                                                   for year in range(2011, 2021)},
+                                            targets=event_timeline.EVENTS_SLIDER,
+                                        )
+                                        )
+                            ]
+                        ),
+                        **{
+                            'data-step': '1',
+                            'data-intro': 'Woah... slider',
+                            'data-position': 'right'
+                        }
+                    )
                 ]
             ),
             dbc.Row(
@@ -77,20 +103,21 @@ app.layout = html.Div(
                     dbc.Col(md=6,
                             className='box',
                             children=[
-                                dbc.Row(
+                                html.Div(dbc.Row(
                                     no_gutters=True,
                                     children=[
                                         dbc.Col(md=6,
                                                 className='fill-height',
                                                 children=[
-                                                    html.H5('Filter:'),
+                                                    html.H5(
+                                                        'Filter:'),
                                                     dcc.RadioItems(
                                                         id='map-type-radiobuttons',
                                                         options=[
                                                             {'label': 'Active companies',
-                                                                'value': 0},
+                                                                      'value': 0},
                                                             {'label': '% of terminated companies',
-                                                                'value': 1}
+                                                                      'value': 1}
                                                         ],
                                                         value=0,
                                                         labelStyle={
@@ -100,9 +127,16 @@ app.layout = html.Div(
                                                     )
                                                 ]
                                                 )
+
                                     ]
                                 ),
-                                dcc.Graph(
+                                    **{
+                                    'data-step': '2',
+                                    'data-intro': 'Dwa checkoboxy, ale duży wybór!',
+                                    'data-position': 'right'
+                                }
+                                ),
+                                html.Div(dcc.Graph(
                                     id='map',
                                     className='fill-height',
                                     config={
@@ -110,15 +144,27 @@ app.layout = html.Div(
                                         'scrollZoom': False
                                     },
                                 ),
+                                    **{
+                                    'data-step': '3',
+                                    'data-intro': 'Mapa! :O',
+                                    'data-position': 'right'
+                                }
+                                ),
                                 html.Div(id="output")
-                                ]
+                            ]
                             ),
                     dbc.Col(md=6,
                             className='box',
                             children=[
-                                dcc.Graph(
+                                html.Div(dcc.Graph(
                                     className='fill-height',
                                     id='timeline',
+                                ),
+                                    **{
+                                    'data-step': '4',
+                                    'data-intro': 'O ja cie.. wykres się zmienia',
+                                    'data-position': 'left'
+                                }
                                 )
                             ]
                             )
@@ -129,16 +175,30 @@ app.layout = html.Div(
                 children=[
                     dbc.Col(md=12,
                             children=[
-                                dcc.Graph(figure=pkd_fig, id='pkd-tree', className='fill-height'),
+                                html.Div(
+                                    dcc.Graph(
+                                        figure=pkd_fig,
+                                        id='pkd-tree',
+                                        className='fill-height'),
+                                    **{
+                                        'data-step': '5',
+                                        'data-intro': 'Tu mamy treemapę',
+                                        'data-position': 'top'
+                                    }
+                                )
                             ]
-                        )
+                            )
                 ]),
-            html.Div(id='selected-voivodeship', style={'display': 'none'}, children=''),
-            html.Div(id='selected-pkd-section', style={'display': 'none'}, children=''),
-            html.Div(id='selected-voivodeship-indices', style={'display': 'none'}, children='')
+            html.Div(id='selected-voivodeship',
+                     style={'display': 'none'}, children=''),
+            html.Div(id='selected-pkd-section',
+                     style={'display': 'none'}, children=''),
+            html.Div(id='selected-voivodeship-indices',
+                     style={'display': 'none'}, children='')
         ]
     )
 )
+
 
 @app.callback(
     Output('map', 'figure'),
@@ -149,6 +209,7 @@ app.layout = html.Div(
     ])
 def update_map(year, map_type, selceted_voivodeships):
     return build_map(int(year), map_type, surv_df, wojewodztwa_geo, selceted_voivodeships)
+
 
 @app.callback(
     [
@@ -161,9 +222,12 @@ def update_map(year, map_type, selceted_voivodeships):
 def select_voivodeship(selectedVoivodeship):
     if selectedVoivodeship is None:
         return [], []
-    selected_voivodeship = [item['location'].upper() for item in selectedVoivodeship['points']]
-    selected_voivodeship_indices = [item['pointIndex'] for item in selectedVoivodeship['points']]
+    selected_voivodeship = [item['location'].upper()
+                            for item in selectedVoivodeship['points']]
+    selected_voivodeship_indices = [item['pointIndex']
+                                    for item in selectedVoivodeship['points']]
     return selected_voivodeship, selected_voivodeship_indices
+
 
 @app.callback(
     [
@@ -209,6 +273,7 @@ def select_pkd_section(click, mapClick, old):
 
     return [selected_section]
 
+
 @app.callback(
     [
         Output('pkd-tree', 'figure'),
@@ -218,6 +283,7 @@ def select_pkd_section(click, mapClick, old):
     ])
 def redraw_treemap(voivodeship):
     return build_pkd_treemap(voivodeship=voivodeship),
+
 
 @app.callback(
     [
@@ -232,7 +298,8 @@ def redraw_timeline(year, voivodeship, pkd_section):
     data = surv_removed_df
 
     if voivodeship != []:
-        data = data[np.isin(data['MainAddressVoivodeship'], [voiv.lower() for voiv in voivodeship])]
+        data = data[np.isin(data['MainAddressVoivodeship'], [
+                            voiv.lower() for voiv in voivodeship])]
     if pkd_section != '':
         if pkd_section.isalpha():
             # section (eg. A, B, C...)
@@ -241,7 +308,8 @@ def redraw_timeline(year, voivodeship, pkd_section):
             # division (eg. 47)
             data = data[data['PKDMainDivision'] == float(pkd_section)]
 
-    data = pd.DataFrame({'count': data.groupby("YearOfTermination").size()}).reset_index()
+    data = pd.DataFrame({'count': data.groupby(
+        "YearOfTermination").size()}).reset_index()
     return [event_timeline.build_event_timeline(data, year)]
 
 
