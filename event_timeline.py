@@ -104,4 +104,9 @@ def build_event_timeline(timeline_mock_df, year):
         )
     )
 
+    fig.update_layout(
+    xaxis_title="Years",
+    yaxis_title="Number of terminated companies",
+    )
+
     return fig
