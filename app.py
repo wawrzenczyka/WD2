@@ -7,7 +7,6 @@ import dash_daq as daq
 from dash.dependencies import Input, Output, State
 import pandas as pd
 import numpy as np
-import json
 from treemap_helper import build_pkd_treemap
 from map_helper import build_map
 import event_timeline
@@ -28,10 +27,6 @@ timeline_mock_df = surv_removed_df[
 
 timeline_mock_df = pd.DataFrame(
     {'count': timeline_mock_df.groupby("YearOfTermination").size()}).reset_index()
-
-# MAP
-with open(os.path.join(THIS_FOLDER, 'assets', 'wojewodztwa-min.geojson'), encoding='utf8') as woj_json:
-    wojewodztwa_geo = json.load(woj_json)
 
 map_type_options = ['Active companies', '% of terminated companies']
 
@@ -146,7 +141,7 @@ app.layout = html.Div(
         Input('selected-voivodeship-indices', 'children'),
     ])
 def update_map(year, map_type, selceted_voivodeships):
-    return build_map(str(year), map_type, wojewodztwa_geo, selceted_voivodeships)
+    return build_map(str(year), map_type, selceted_voivodeships)
 
 @app.callback(
     [

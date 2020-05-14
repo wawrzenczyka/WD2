@@ -3,16 +3,24 @@ import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 import os
+import json
+
+
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
+with open(os.path.join(THIS_FOLDER, 'assets', 'wojewodztwa-min.geojson'), encoding='utf8') as woj_json:
+    wojewodztwa_geo = json.load(woj_json)
+
 voivodes_by_year = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'voivoides_by_year.csv'), encoding='UTF-8')
+
 
 def build_map(
         year,
         map_type,
-        wojewodztwa_geo,
         selceted_voivodeships
 ):
+    global wojewodztwa_geo
+    global voivodes_by_year
     map = {
         'color': 'active',
         'min': 0,
