@@ -6,7 +6,7 @@
   background: black;
 }
 
-.main-wrapper {
+.screen-height {
   height: 100vh;
 }
 
@@ -19,13 +19,17 @@
   align-items: stretch;
 }
 
+.year-section{
+  height: 10%;
+}
+
 .top {
   background: #f9f9f9;
-  height: 65%;
+  height: 60%;
   width: 100%;
 }
 .bottom {
-  height: 35%;
+  height: 30%;
   background: #f9f9f9;
   width: 100%;
 }
@@ -38,4 +42,13 @@
   display: flex;
   flex-flow: column;
   height: 100%;
+}
+
+#year{
+  margin: 2vh 0 0 7vw;
+  font-size: 2rem;
+}
+
+#year-slider{
+  margin: 3vh 0 0 0;
 }

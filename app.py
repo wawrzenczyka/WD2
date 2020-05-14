@@ -41,17 +41,13 @@ VOIVODESHIPS_MAPPING = [
     {'label': '', 'value': 'na'},
 ]
 
-
-
 # LOAD DATA
 surv_df = ceidg_dataset.load()
 surv_removed_df = surv_df[surv_df['Terminated'] == 1]
 
-
 # Global first-page variables
 voivodeship = ''
 pkd_section = ''
-
 
 # TIMELINE DATA
 timeline_mock_df = surv_removed_df[
@@ -60,121 +56,130 @@ timeline_mock_df = surv_removed_df[
 timeline_mock_df = pd.DataFrame(
     {'count': timeline_mock_df.groupby("YearOfTermination").size()}).reset_index()
 
-
 # MAP
 with open(os.path.join(THIS_FOLDER, 'assets', 'wojewodztwa-min.geojson'), encoding='utf8') as woj_json:
     wojewodztwa_geo = json.load(woj_json)
 
 map_type_options = ['Active companies', '% of terminated companies']
 
-
 # Treemap init
 pkd_fig = build_pkd_treemap()
 
 app = dash.Dash(__name__, external_stylesheets=[
     dbc.themes.BOOTSTRAP,
-    './first-tab.css'
+    './styles.css'
 ])
 
 # PREDICTION MODEL
 clf = load('model.joblib')
 
-app.layout = html.Div(
-    className='main-wrapper',
-    children=[
-        html.Div(
-            className='section',
-            children=[
-                dbc.Row(
-                    children=[
-                        dbc.Col(md=2,
-                                children=html.H3("Year:")
-                                ),
-                        dbc.Col(md=2,
-                                children=daq.Slider(
-                                    color="default",
-                                    id='year-slider',
-                                    min=2011,
-                                    max=2020,
-                                    step=0.5,
-                                    value=2020,
-                                    size=1000,
-                                    marks={year + 0.01: str(int(year))
-                                           for year in range(2011, 2021)},
-                                    targets=event_timeline.EVENTS_SLIDER,
-                                ),
-                                )
-                    ]
-                ),
-                dbc.Row(
-                    className='top',
-                    no_gutters=True,
-                    children=[
-                        dbc.Col(md=6,
-                                className='box',
-                                children=[
-                                    dbc.Row(
-                                        no_gutters=True,
-                                        children=[
-                                            dbc.Col(md=6,
-                                                    className='fill-height',
-                                                    children=[
-                                                        html.H5('Filter:'),
-                                                        dcc.RadioItems(
-                                                            id='map-type-radiobuttons',
-                                                            options=[
-                                                                {'label': 'Active companies',
-                                                                 'value': 0},
-                                                                {'label': '% of terminated companies',
-                                                                 'value': 1}
-                                                            ],
-                                                            value=0,
-                                                            labelStyle={
-                                                                'display': 'inline-block',
-                                                                'padding': 5
-                                                            }
-                                                        )
-                                                    ]
-                                                    )
-                                        ]
+app.layout = html.Div([
+    html.Div(
+        className='screen-height',
+        children=[
+            html.Div(
+                className='section',
+                children=[
+                    dbc.Row(
+                        className='year-section',
+                        children=[
+                            dbc.Col(md=2,
+                                    children=html.H3("Rok:", id='year')
                                     ),
-                                    dcc.Graph(
-                                        id='map',
-                                        className='fill-height',
-                                        config={
-                                            'displayModeBar': False,
-                                            'scrollZoom': False
-                                        },
+                            dbc.Col(md=10,
+                                    children=daq.Slider(
+                                        color="default",
+                                        id='year-slider',
+                                        min=2011,
+                                        max=2020,
+                                        step=0.5,
+                                        value=2020,
+                                        size=1000,
+                                        marks={year + 0.01: str(int(year))
+                                               for year in range(2011, 2021)},
+                                        targets=event_timeline.EVENTS_SLIDER,
                                     ),
-                                    html.Div(id="output")
-                                ]
-                                ),
-                        dbc.Col(md=6,
-                                className='box',
-                                children=[
-                                    dcc.Graph(
-                                        className='fill-height',
-                                        id='timeline',
                                     )
-                                ]
-                                )
-                    ]),
-                dbc.Row(
-                    className='bottom',
-                    no_gutters=True,
-                    children=[
-                        dbc.Col(md=12,
-                                children=[
-                                    dcc.Graph(figure=pkd_fig, id='pkd-tree', className='fill-height'),
-                                ]
-                                )
-                    ]),
-                html.Div(id='selected-voivodeship', style={'display': 'none'}, children=''),
-                html.Div(id='selected-pkd-section', style={'display': 'none'}, children=''),
-                html.Div(id='selected-voivodeship-indices', style={'display': 'none'}, children='')
-            ]
-        ),
-        html.Div(
+                        ]
+                    ),
+                    dbc.Row(
+                        className='top',
+                        no_gutters=True,
+                        children=[
+                            dbc.Col(md=6,
+                                    className='box',
+                                    children=[
+                                        dbc.Row(
+                                            no_gutters=True,
+                                            children=[
+                                                dbc.Col(md=6,
+                                                        className='fill-height',
+                                                        children=[
+                                                            html.H5('Filter:'),
+                                                            dcc.RadioItems(
+                                                                id='map-type-radiobuttons',
+                                                                options=[
+                                                                    {'label': 'Active companies',
+                                                                     'value': 0},
+                                                                    {'label': '% of terminated companies',
+                                                                     'value': 1}
+                                                                ],
+                                                                value=0,
+                                                                labelStyle={
+                                                                    'display': 'inline-block',
+                                                                    'padding': 5
+                                                                }
+                                                            )
+                                                        ]
+                                                        )
+                                            ]
+                                        ),
+                                        dcc.Graph(
+                                            id='map',
+                                            className='fill-height',
+                                            config={
+                                                'displayModeBar': False,
+                                                'scrollZoom': False
+                                            },
+                                        ),
+                                        html.Div(id="output")
+                                    ]
+                                    ),
+                            dbc.Col(md=6,
+                                    className='box',
+                                    children=[
+                                        dcc.Graph(
+                                            className='fill-height',
+                                            id='timeline',
+                                        )
+                                    ]
+                                    )
+                        ]),
+                    dbc.Row(
+                        className='bottom',
+                        no_gutters=True,
+                        children=[
+                            dbc.Col(md=12,
+                                    className='box',
+                                    children=[
+                                        dcc.Graph(
+                                            figure=pkd_fig,
+                                            id='pkd-tree',
+                                            className='fill-height',
+
+                                        ),
+                                    ]
+                                    )
+                        ]),
+                    html.Div(id='selected-voivodeship', style={'display': 'none'}, children=''),
+                    html.Div(id='selected-pkd-section', style={'display': 'none'}, children=''),
+                    html.Div(id='selected-voivodeship-indices', style={'display': 'none'}, children='')
+                ]
+            )]
+    ),
+    html.Div(
+        className='screen-height',
+        children=[html.Div(
             id='prediction',
             style={'text-align': 'center'},
             children=[
@@ -273,9 +278,9 @@ app.layout = html.Div(
 
                 dcc.Graph(id='bankrupcy_proba-graph')
             ]
-        )
-    ]
-)
+        )]
+    )
+])
 
 
 @app.callback(

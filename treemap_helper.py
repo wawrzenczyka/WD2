@@ -163,12 +163,14 @@ def build_pkd_treemap(voivodeship = []):
 
     pkd_fig.update_layout(
         title = {
+
             'text': "Czas życia przeciętnej firmy",
             'y': 0.9,
             'x': 0.5,
             'xanchor': 'center',
             'yanchor': 'top'
-        }
+        },
+        margin=dict(l=20, r=20, t=70, b=20),
     )
 
     return pkd_fig
