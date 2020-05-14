@@ -5,37 +5,32 @@ import numpy as np
 import os
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
-voivodeship_lat_lon_data = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'voi_lon_lat.csv'), encoding = 'UTF-8')
+voivodes_by_year = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'voivoides_by_year.csv'), encoding='UTF-8')
 
 def build_map(
         year,
         map_type,
-        surv_df,
         wojewodztwa_geo,
         selceted_voivodeships
 ):
-    map = {'color': 'active', 'min': 0, 'max': 44108} \
-        if map_type == 0 else {'color': 'TerminatedPercentage', 'min': 0, 'max': 80}
+    map = {
+        'color': 'active',
+        'min': 0,
+        'max': 44108
+    } if map_type == 0 else {
+        'color': 'TerminatedPercentage',
+        'min': 0,
+        'max': 80
+    }
 
-    terminated = surv_df[surv_df['YearOfTermination'] <= year][['MainAddressVoivodeship', 'Count']].groupby('MainAddressVoivodeship').sum()
-    all = surv_df[['MainAddressVoivodeship', 'Count']].groupby('MainAddressVoivodeship').sum()
-    voivode_df = pd.concat([terminated, all], axis=1, keys=['terminated', 'all'], sort=True)\
-        .reset_index()
-    voivode_df.columns = voivode_df.columns.droplevel(1)
-    voivode_df['TerminatedPercentage'] = voivode_df['terminated'] / \
-        voivode_df['all'] * 100.0
-    voivode_df['active'] = voivode_df['all'] - voivode_df['terminated']
-
-
-    df = voivode_df.merge(voivodeship_lat_lon_data,
-        left_on = 'MainAddressVoivodeship',
-        right_on = 'voivodeship'
-    )
+    df = voivodes_by_year[['MainAddressVoivodeship', 'all', 'lon', 'lat', year]].rename(columns={year: 'terminated'})
+    df['TerminatedPercentage'] = df['terminated'] / df['all'] * 100.0
+    df['active'] = df['all'] - df['terminated']
 
     label_text = df.round(2).TerminatedPercentage.astype(str) + '%' if map['color']=='TerminatedPercentage' else df['active'].astype(str)
 
     colorscale = np.array(px.colors.sequential.Viridis)
-    color_values = (voivode_df[map['color']]/map['max'])*(len(colorscale)-1)
+    color_values = (df[map['color']]/map['max'])*(len(colorscale)-1)
 
     color_min_index = np.floor(color_values).astype(int)
     color_max_index = np.ceil(color_values).astype(int)
@@ -61,19 +56,19 @@ def build_map(
     fig = go.Figure()
 
     customdata = df.assign(TerminatedPercentage = df.round(2).TerminatedPercentage.astype(str) + '%')\
-                    [['voivodeship', 'TerminatedPercentage', 'active']]
+                    [['MainAddressVoivodeship', 'TerminatedPercentage', 'active']]
     hovertemplate = 'Województwo %{customdata[0]}<br>' + \
                     'Procent zamkniętych firm: <b>%{customdata[1]}</b><br>' + \
                     'Liczba aktywnych firm: <b>%{customdata[2]}</b><br>'
 
     if not selceted_voivodeships:
         fig.add_choroplethmapbox(colorscale=colorscale, geojson=wojewodztwa_geo, customdata=customdata, hovertemplate=hovertemplate, 
-                                locations=voivode_df['MainAddressVoivodeship'], z=voivode_df[map['color']], zmax=map['max'], zmin=map['min'], 
+                                locations=df['MainAddressVoivodeship'], z=df[map['color']], zmax=map['max'], zmin=map['min'], 
                                 featureidkey="properties.nazwa",
                                 showscale=True, marker={'opacity': 0.7}, name='', below=True)
     else:
         fig.add_choroplethmapbox(colorscale=colorscale, geojson=wojewodztwa_geo, customdata=customdata, hovertemplate=hovertemplate, 
-                                locations=voivode_df['MainAddressVoivodeship'], z=voivode_df[map['color']], zmax=map['max'], marker={'opacity': 0.5}, 
+                                locations=df['MainAddressVoivodeship'], z=df[map['color']], zmax=map['max'], marker={'opacity': 0.5}, 
                                 zmin=map['min'], featureidkey="properties.nazwa", name='',
                                 showscale=True, selected={'marker': {'opacity': 0.7}}, 
                                 unselected={'marker': {'opacity': 0.2}},
