@@ -3,6 +3,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+import dash_daq as daq
 from dash.dependencies import Input, Output, State
 import plotly.express as px
 import pandas as pd
@@ -50,19 +51,22 @@ app.layout = html.Div(
         children=[
             dbc.Row(
                 children=[
-                    dbc.Col(md=1,
+                    dbc.Col(md=2,
                             children=html.H3("Year:")
                             ),
-                    dbc.Col(md=11,
-                            children=dcc.Slider(
+                    dbc.Col(md=2,
+                            children=daq.Slider(
+                                color="default",
                                 id='year-slider',
                                 min=2011,
                                 max=2020,
-                                step=1,
+                                step=0.5,
                                 value=2020,
-                                marks={year: str(year)
-                                       for year in range(2011, 2021)}
-                            )
+                                size=1000,
+                                marks={year+0.01: str(int(year))
+                                       for year in range(2011, 2021)},
+                                targets=event_timeline.EVENTS_SLIDER,
+                            ),
                             )
                 ]
             ),
@@ -144,7 +148,7 @@ app.layout = html.Div(
         Input('selected-voivodeship-indices', 'children'),
     ])
 def update_map(year, map_type, selceted_voivodeships):
-    return build_map(year, map_type, surv_df, wojewodztwa_geo, selceted_voivodeships)
+    return build_map(int(year), map_type, surv_df, wojewodztwa_geo, selceted_voivodeships)
 
 @app.callback(
     [
@@ -220,10 +224,11 @@ def redraw_treemap(voivodeship):
         Output('timeline', 'figure'),
     ],
     [
+        Input('year-slider', 'value'),
         Input('selected-voivodeship', 'children'),
         Input('selected-pkd-section', 'children'),
     ])
-def redraw_timeline(voivodeship, pkd_section):
+def redraw_timeline(year, voivodeship, pkd_section):
     data = surv_removed_df
 
     if voivodeship != []:
@@ -237,7 +242,7 @@ def redraw_timeline(voivodeship, pkd_section):
             data = data[data['PKDMainDivision'] == float(pkd_section)]
 
     data = pd.DataFrame({'count': data.groupby("YearOfTermination").size()}).reset_index()
-    return [event_timeline.build_event_timeline(data)]
+    return [event_timeline.build_event_timeline(data, year)]
 
 
 if __name__ == '__main__':

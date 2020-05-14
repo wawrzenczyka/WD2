@@ -5,13 +5,13 @@ import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 import numpy as np
 
-EVENTS = [
-    {'years': [2013], 'text': 'Nowe podatki', 'ax': 30, 'ay': -25},
-    {'years': [2014], 'text': 'Upadki skoków', 'ax': 30, 'ay': -25},
-    {'years': [2016], 'text': 'Zaostrzenie przepisów', 'ax': 20, 'ay': -85},
-    {'years': [2016, 2017], 'text': 'Nowe podatki', 'ax': 40, 'ay': -55},
-    {'years': [2017], 'text': 'Kontrole rolników', 'ax': 60, 'ay': -25},
-]
+EVENTS_SLIDER = {
+    2013: {"label": 'Nowe podatki', 'style': {"color": "#CD5C5C"}},
+    2014: {"label": 'Upadki skoków', 'style': {"color": "#FF9933"}},
+    2016: {"label": 'Zaostrzenie przepisów', 'style': {"color": "#99FF33"}},
+    2016.5: {"label": 'Nowe podatki', 'style': {"color": "#7F00FF"}},
+    2017: {"label": 'Kontrole rolników', 'style': {"color": "#00BFFF"}},
+}
 
 EVENTS_DESCRIPTION = {
     2011: '',
@@ -28,30 +28,36 @@ EVENTS_DESCRIPTION = {
 }
 
 
-def build_event_timeline(timeline_mock_df):
+def build_event_timeline(timeline_mock_df, year):
     fig = go.Figure()
-    fig.add_trace(
-        go.Scatter(
-            x=timeline_mock_df['YearOfTermination'],
-            y=timeline_mock_df['count'],
-            mode='lines',
-            name='lines',
-            showlegend=False,
-            text=list(EVENTS_DESCRIPTION.values()),
-            hoverinfo='text',
-        )
-    )
 
-    for event in EVENTS:
-        years = event['years']
+    if year in EVENTS_SLIDER:
+        if year > int(year):
+            years = [year - 0.5, year + 0.5]
+        else:
+            years = [year]
+
         y = timeline_mock_df[timeline_mock_df['YearOfTermination'].isin(years)]['count'].mean()
+
+        fig.add_trace(
+            go.Scatter(
+                x=[np.mean(year)],
+                y=[y],
+                mode='markers',
+                name='markers',
+                showlegend=False,
+                marker=dict(size=18, opacity=1, color=EVENTS_SLIDER[np.mean(years)]['style']['color']),
+                hoverinfo='none',
+            )
+        )
+
         fig.add_annotation(
-            x=np.mean(years),
+            x=np.mean(year),
             y=y,
-            text=event['text'],
+            text=EVENTS_SLIDER[year]['label'],
             showarrow=True,
-            ax=event['ax'],
-            ay=event['ay'],
+            ax=40,
+            ay=-35,
             bordercolor="#c7c7c7",
             borderwidth=1,
             borderpad=3,
@@ -63,5 +69,39 @@ def build_event_timeline(timeline_mock_df):
             arrowcolor="#636363",
             align="center",
         )
+
+    for year in EVENTS_SLIDER.keys():
+        if year > int(year):
+            years = [year - 0.5, year + 0.5]
+        else:
+            years = [year]
+
+        y = timeline_mock_df[timeline_mock_df['YearOfTermination'].isin(years)]['count'].mean()
+
+        fig.add_trace(
+            go.Scatter(
+                x=[np.mean(year)],
+                y=[y],
+                mode='markers',
+                name='markers',
+                showlegend=False,
+                marker=dict(size=18, opacity=0.25, color=EVENTS_SLIDER[year]['style']['color']),
+                hoverinfo='none',
+                #marker_symbol="star",
+            )
+        )
+
+    fig.add_trace(
+        go.Scatter(
+            x=timeline_mock_df['YearOfTermination'],
+            y=timeline_mock_df['count'],
+            mode='lines',
+            name='lines',
+            showlegend=False,
+            text=list(EVENTS_DESCRIPTION.values()),
+            hoverinfo='text',
+            marker=dict(color='darkblue'),
+        )
+    )
 
     return fig
