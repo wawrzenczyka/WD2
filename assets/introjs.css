@@ -1,3 +1,23 @@
+/* ---------------- Custom stuff -------------------- */
+.customDefault .introjs-skipbutton {
+  color: rgb(255, 70, 70);
+  align-content: flex-start;
+  position: absolute; 
+  left: 0;
+  margin-left: 10px;
+}
+.customDefault .introjs-skipbutton:hover {
+  color: rgb(230, 0, 0);
+}
+
+.customDefault .introjs-nextbutton {
+  color: #08c;
+}
+.customDefault .introjs-nextbutton:hover {
+  color: rgb(0, 0, 199);
+}
+/* ---------------- Custom stuff -------------------- */
+
 .introjs-overlay {
   position: absolute;
   box-sizing: content-box;
@@ -296,6 +316,7 @@ tr.introjs-showElement > th {
   background-color: #f4f4f4;
   background-image: none;
   text-decoration: none;
+  display: none !important;
 }
 
 .introjs-hidden {

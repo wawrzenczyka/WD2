@@ -54,8 +54,7 @@ app.layout = html.Div(
                 align="center",
                 children=[
                     html.A(
-                        id="flexi_form_start",
-                        href="javascript:introJs().start();",
+                        href="javascript:customStartIntro();",
                         children="Start tour",
                         style={
                             'text-size': '40pt',
@@ -66,33 +65,26 @@ app.layout = html.Div(
             ),
             dbc.Row(
                 children=[
-                    html.Div(
-                        children=dbc.Row(
-                            children=[
-                                dbc.Col(md=2,
-                                        children=html.H3("Year:")
-                                        ),
-                                dbc.Col(md=2,
-                                        children=daq.Slider(
-                                            color="default",
-                                            id='year-slider',
-                                            min=2011,
-                                            max=2020,
-                                            step=0.5,
-                                            value=2020,
-                                            size=1000,
-                                            marks={year+0.01: str(int(year))
-                                                   for year in range(2011, 2021)},
-                                            targets=event_timeline.EVENTS_SLIDER,
-                                        )
-                                        )
-                            ]
-                        ),
-                        **{
-                            'data-step': '1',
-                            'data-intro': 'Woah... slider',
-                            'data-position': 'right'
-                        }
+                    dbc.Row(
+                        children=[
+                            dbc.Col(md=2,
+                                    children=html.H3("Year:")
+                                    ),
+                            dbc.Col(md=2,
+                                    children=daq.Slider(
+                                        color="default",
+                                        id='year-slider',
+                                        min=2011,
+                                        max=2020,
+                                        step=0.5,
+                                        value=2020,
+                                        size=1000,
+                                        marks={year+0.01: str(int(year))
+                                               for year in range(2011, 2021)},
+                                        targets=event_timeline.EVENTS_SLIDER,
+                                    ),
+                                    )
+                        ]
                     )
                 ]
             ),
@@ -103,70 +95,54 @@ app.layout = html.Div(
                     dbc.Col(md=6,
                             className='box',
                             children=[
-                                html.Div(dbc.Row(
-                                    no_gutters=True,
-                                    children=[
-                                        dbc.Col(md=6,
-                                                className='fill-height',
-                                                children=[
-                                                    html.H5(
-                                                        'Filter:'),
-                                                    dcc.RadioItems(
-                                                        id='map-type-radiobuttons',
-                                                        options=[
-                                                            {'label': 'Active companies',
-                                                                      'value': 0},
-                                                            {'label': '% of terminated companies',
-                                                                      'value': 1}
-                                                        ],
-                                                        value=0,
-                                                        labelStyle={
-                                                            'display': 'inline-block',
-                                                            'padding': 5
-                                                        }
+                                html.Div(
+                                    id="step2",
+                                    children=dbc.Row(
+                                        no_gutters=True,
+                                        children=[
+                                            dbc.Col(md=6,
+                                                    className='fill-height',
+                                                    children=[
+                                                        html.H5('Filter:'),
+                                                        dcc.RadioItems(
+                                                            id='map-type-radiobuttons',
+                                                            options=[
+                                                                {'label': 'Active companies',
+                                                                 'value': 0},
+                                                                {'label': '% of terminated companies',
+                                                                 'value': 1}
+                                                            ],
+                                                            value=0,
+                                                            labelStyle={
+                                                                'display': 'inline-block',
+                                                                'padding': 5
+                                                            }
+                                                        )
+                                                    ]
                                                     )
-                                                ]
-                                                )
-
-                                    ]
+                                        ]
+                                    )
                                 ),
-                                    **{
-                                    'data-step': '2',
-                                    'data-intro': 'Dwa checkoboxy, ale duży wybór!',
-                                    'data-position': 'right'
-                                }
-                                ),
-                                html.Div(dcc.Graph(
-                                    id='map',
-                                    className='fill-height',
-                                    config={
-                                        'displayModeBar': False,
-                                        'scrollZoom': False
-                                    },
-                                ),
-                                    **{
-                                    'data-step': '3',
-                                    'data-intro': 'Mapa! :O',
-                                    'data-position': 'right'
-                                }
+                                html.Div(
+                                    id='step3',
+                                    children=dcc.Graph(
+                                        id='map',
+                                        className='fill-height',
+                                        config={
+                                            'displayModeBar': False,
+                                            'scrollZoom': False
+                                        },
+                                    )
                                 ),
                                 html.Div(id="output")
                             ]
                             ),
                     dbc.Col(md=6,
                             className='box',
-                            children=[
-                                html.Div(dcc.Graph(
-                                    className='fill-height',
-                                    id='timeline',
-                                ),
-                                    **{
-                                    'data-step': '4',
-                                    'data-intro': 'O ja cie.. wykres się zmienia',
-                                    'data-position': 'left'
-                                }
-                                )
-                            ]
+                            children=dcc.Graph(
+                                className='fill-height',
+                                id='timeline',
+                            )
                             )
                 ]),
             dbc.Row(
@@ -174,19 +150,10 @@ app.layout = html.Div(
                 no_gutters=True,
                 children=[
                     dbc.Col(md=12,
-                            children=[
-                                html.Div(
-                                    dcc.Graph(
-                                        figure=pkd_fig,
-                                        id='pkd-tree',
-                                        className='fill-height'),
-                                    **{
-                                        'data-step': '5',
-                                        'data-intro': 'Tu mamy treemapę',
-                                        'data-position': 'top'
-                                    }
-                                )
-                            ]
+                            children=dcc.Graph(
+                                figure=pkd_fig,
+                                id='pkd-tree',
+                                className='fill-height')
                             )
                 ]),
             html.Div(id='selected-voivodeship',
