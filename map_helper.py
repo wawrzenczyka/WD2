@@ -38,37 +38,10 @@ def build_map(
     label_text = df.round(2).TerminatedPercentage.astype(str) + '%' if map['color'] == 'TerminatedPercentage' else df[
         'active'].astype(str)
 
-    colorscale = 'Viridis' #np.array(px.colors.sequential.Viridis)
-    '''
-    color_values = (df[map['color']] / map['max']) * (len(colorscale) - 1)
-
-    color_min_index = np.floor(color_values).astype(int)
-    color_max_index = np.ceil(color_values).astype(int)
-
-    min_colors = colorscale[color_min_index.tolist()]
-    max_colors = colorscale[color_max_index.tolist()]
-
-    colors = pd.DataFrame({'min_color': min_colors, 'max_color': max_colors})
-    r_min = colors.min_color.str.slice(1, 3).apply(int, base=16)
-    g_min = colors.min_color.str.slice(3, 5).apply(int, base=16)
-    b_min = colors.min_color.str.slice(5, 7).apply(int, base=16)
-    r_max = colors.max_color.str.slice(1, 3).apply(int, base=16)
-    g_max = colors.max_color.str.slice(3, 5).apply(int, base=16)
-    b_max = colors.max_color.str.slice(5, 7).apply(int, base=16)
-
-    r = (r_min + (r_max - r_min) * (color_values - color_min_index))
-    g = (g_min + (g_max - g_min) * (color_values - color_min_index))
-    b = (b_min + (b_max - b_min) * (color_values - color_min_index))
-    y = 0.2126 * (r / 255) + 0.7152 * (g / 255) + 0.0722 * (b / 255)
-    '''
-
+    colorscale = 'Viridis'
     y = df[map['color']] / map['max']
-
     black_indexes, *_ = np.where(y > 0.5)
     white_indexes, *_ = np.where(y <= 0.5)
-
-    print(black_indexes)
-    print(white_indexes)
 
     fig = go.Figure()
 
