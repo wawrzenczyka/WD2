@@ -86,7 +86,7 @@ app.layout = html.Div([
                             dbc.Col(md=2,
                                     children=html.H3("Rok:", id='year')
                                     ),
-                            dbc.Col(md=10,
+                            dbc.Col(md=8,
                                     children=daq.Slider(
                                         color="default",
                                         id='year-slider',
@@ -99,6 +99,18 @@ app.layout = html.Div([
                                                for year in range(2011, 2021)},
                                         targets=event_timeline.EVENTS_SLIDER,
                                     ),
+                                    ),
+                            dbc.Col(md=2,
+                                    children=[
+                                        html.A(
+                                            href="javascript:customStartIntro();",
+                                            children="Start tour",
+                                            style={
+                                                'text-size': '40pt',
+                                                'padding-bottom': '40px'
+                                            }
+                                        )
+                                    ]
                                     )
                         ]
                     ),
@@ -113,6 +125,7 @@ app.layout = html.Div([
                                             no_gutters=True,
                                             children=[
                                                 dbc.Col(md=6,
+                                                        id='map-filters',
                                                         className='fill-height',
                                                         children=[
                                                             html.H5('Filter:'),
@@ -279,6 +292,7 @@ app.layout = html.Div([
                 dcc.Graph(id='bankrupcy_proba-graph')
             ]
         )]
+
     )
 ])
 
@@ -305,8 +319,10 @@ def update_map(year, map_type, selceted_voivodeships):
 def select_voivodeship(selectedVoivodeship):
     if selectedVoivodeship is None:
         return [], []
-    selected_voivodeship = [item['location'].upper() for item in selectedVoivodeship['points']]
-    selected_voivodeship_indices = [item['pointIndex'] for item in selectedVoivodeship['points']]
+    selected_voivodeship = [item['location'].upper()
+                            for item in selectedVoivodeship['points']]
+    selected_voivodeship_indices = [item['pointIndex']
+                                    for item in selectedVoivodeship['points']]
     return selected_voivodeship, selected_voivodeship_indices
 
 
@@ -379,7 +395,8 @@ def redraw_timeline(year, voivodeship, pkd_section):
     data = surv_removed_df
 
     if voivodeship != []:
-        data = data[np.isin(data['MainAddressVoivodeship'], [voiv.lower() for voiv in voivodeship])]
+        data = data[np.isin(data['MainAddressVoivodeship'], [
+            voiv.lower() for voiv in voivodeship])]
     if pkd_section != '':
         if pkd_section.isalpha():
             # section (eg. A, B, C...)
@@ -388,7 +405,8 @@ def redraw_timeline(year, voivodeship, pkd_section):
             # division (eg. 47)
             data = data[data['PKDMainDivision'] == float(pkd_section)]
 
-    data = pd.DataFrame({'count': data.groupby("YearOfTermination").size()}).reset_index()
+    data = pd.DataFrame({'count': data.groupby(
+        "YearOfTermination").size()}).reset_index()
     return [event_timeline.build_event_timeline(data, year)]
 
 
