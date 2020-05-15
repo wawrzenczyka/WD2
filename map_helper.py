@@ -67,9 +67,12 @@ def build_map(
     black_indexes, *_ = np.where(y > 0.5)
     white_indexes, *_ = np.where(y <= 0.5)
 
+    print(black_indexes)
+    print(white_indexes)
+
     fig = go.Figure()
 
-    customdata = df.assign(TerminatedPercentage=df.round(2).TerminatedPercentage.astype(str) + '%') \
+    customdata = df.assign(TerminatedPercentage=df.round(2).TerminatedPercentage.astype(str) + '%')\
         [['MainAddressVoivodeship', 'TerminatedPercentage', 'active']]
     hovertemplate = 'Województwo %{customdata[0]}<br>' + \
                     'Procent zamkniętych firm: <b>%{customdata[1]}</b><br>' + \
@@ -93,21 +96,20 @@ def build_map(
                                  selectedpoints=selceted_voivodeships, below=True)
 
     for i, color in zip([black_indexes, white_indexes], ["black", "white"]):
-        if len(i) > 0:
-            fig.add_scattermapbox(
-                lat=df.lat[i],
-                lon=df.lon[i],
-                mode='text',
-                text=label_text[i],
-                textfont={
-                    "color": color,
-                    "family": 'Verdana, sans-serif',
-                    "size": 12,
-                },
-                name='',
-                showlegend=False,
-                hoverinfo='skip'
-            )
+        fig.add_scattermapbox(
+            lat=df.lat[i],
+            lon=df.lon[i],
+            mode='text',
+            text=label_text[i],
+            textfont={
+                "color": color,
+                "family": 'Verdana, sans-serif',
+                "size": 12,
+            },
+            name='',
+            showlegend=False,
+            hoverinfo='skip'
+        )
 
     fig.update_layout(
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
