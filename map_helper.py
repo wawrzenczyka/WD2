@@ -38,7 +38,8 @@ def build_map(
     label_text = df.round(2).TerminatedPercentage.astype(str) + '%' if map['color'] == 'TerminatedPercentage' else df[
         'active'].astype(str)
 
-    colorscale = np.array(px.colors.sequential.Viridis)
+    colorscale = 'Viridis' #np.array(px.colors.sequential.Viridis)
+    '''
     color_values = (df[map['color']] / map['max']) * (len(colorscale) - 1)
 
     color_min_index = np.floor(color_values).astype(int)
@@ -59,6 +60,9 @@ def build_map(
     g = (g_min + (g_max - g_min) * (color_values - color_min_index))
     b = (b_min + (b_max - b_min) * (color_values - color_min_index))
     y = 0.2126 * (r / 255) + 0.7152 * (g / 255) + 0.0722 * (b / 255)
+    '''
+
+    y = df[map['color']] / map['max']
 
     black_indexes, *_ = np.where(y > 0.5)
     white_indexes, *_ = np.where(y <= 0.5)
