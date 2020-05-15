@@ -9,7 +9,7 @@ function customStartIntro(){
             position: 'right'
           },
           {
-            element: '#step2',
+            element: '#map-filters',
             intro: "Dwa <i>checkboxy</i>? Tyle możliwości...",
             position: 'right'
           },
