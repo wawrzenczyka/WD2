@@ -60,7 +60,8 @@ def build_map(
     b = (b_min + (b_max - b_min) * (color_values - color_min_index))
     y = 0.2126 * (r / 255) + 0.7152 * (g / 255) + 0.0722 * (b / 255)
 
-    text_color = np.where(y > 0.5, "black", "white").tolist()
+    black_indexes, *_ = np.where(y > 0.5)
+    white_indexes, *_ = np.where(y <= 0.5)
 
     fig = go.Figure()
 
@@ -87,21 +88,22 @@ def build_map(
                                  unselected={'marker': {'opacity': 0.2}},
                                  selectedpoints=selceted_voivodeships, below=True)
 
-    for i in range(0, 16):
-        fig.add_scattermapbox(
-            lat=[df.lat[i]],
-            lon=[df.lon[i]],
-            mode='text',
-            text=[label_text[i]],
-            textfont={
-                "color": text_color[i],
-                "family": 'Verdana, sans-serif',
-                "size": 12,
-            },
-            name='',
-            showlegend=False,
-            hoverinfo='skip'
-        )
+    for i, color in zip([black_indexes, white_indexes], ["black", "white"]):
+        if len(i) > 0:
+            fig.add_scattermapbox(
+                lat=df.lat[i],
+                lon=df.lon[i],
+                mode='text',
+                text=label_text[i],
+                textfont={
+                    "color": color,
+                    "family": 'Verdana, sans-serif',
+                    "size": 12,
+                },
+                name='',
+                showlegend=False,
+                hoverinfo='skip'
+            )
 
     fig.update_layout(
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
@@ -114,7 +116,6 @@ def build_map(
             ),
             pitch=0,
             zoom=5.1
-            # style="white-bg"
         ),
         clickmode='event+select'
     )
