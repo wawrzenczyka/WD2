@@ -13,6 +13,13 @@ import event_timeline
 import os
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
+# Init app
+app = dash.Dash(__name__, external_stylesheets=[
+    dbc.themes.BOOTSTRAP,
+    './first-tab.css'
+])
+
+server = app.server
 
 surv_df = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'ceidg_data_formated.csv'), encoding="utf-8")
 surv_removed_df = surv_df[surv_df['Terminated'] == 1]
@@ -33,10 +40,6 @@ map_type_options = ['Active companies', '% of terminated companies']
 # Treemap init
 pkd_fig = build_pkd_treemap()
 
-app = dash.Dash(__name__, external_stylesheets=[
-    dbc.themes.BOOTSTRAP,
-    './first-tab.css'
-])
 app.layout = html.Div(
     className='main-wrapper',
     children=html.Div(
