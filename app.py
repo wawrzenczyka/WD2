@@ -141,7 +141,7 @@ app.layout = html.Div(
         Input('selected-voivodeship-indices', 'children'),
     ])
 def update_map(year, map_type, selceted_voivodeships):
-    return build_map(str(year), map_type, selceted_voivodeships)
+    return build_map(int(year), map_type, selceted_voivodeships)
 
 @app.callback(
     [
