@@ -103,8 +103,10 @@ def build_event_timeline(timeline_mock_df, year):
             marker=dict(color='darkblue'),
         )
     )
-
+    fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='#d5d5d5')
+    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='#d5d5d5')
     fig.update_layout(
+        plot_bgcolor='#ffffff',
         xaxis_title="Lata",
         yaxis_title="Liczba zamkniętych firm",
         title={
