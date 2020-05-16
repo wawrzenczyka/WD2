@@ -1,4 +1,7 @@
 /* ---------------- Custom stuff -------------------- */
+.customDefault {
+  width: fit-content;
+}
 .customDefault .introjs-skipbutton {
   color: rgb(255, 70, 70);
   align-content: flex-start;
