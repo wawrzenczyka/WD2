@@ -105,8 +105,16 @@ def build_event_timeline(timeline_mock_df, year):
     )
 
     fig.update_layout(
-    xaxis_title="Years",
-    yaxis_title="Number of terminated companies",
+        xaxis_title="Lata",
+        yaxis_title="Liczba zamkniętych firm",
+        title={
+                'text': "Liczba zamykanych firm w obrębie miesiąca",
+                'y': 0.99,
+                'x': 0.5,
+                'xanchor': 'center',
+                'yanchor': 'top'
+            },
+        margin=dict(l=100, r=60, t=30, b=0),
     )
 
     return fig
