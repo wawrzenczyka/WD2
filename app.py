@@ -28,15 +28,6 @@ surv_removed_df = surv_df[surv_df['Terminated'] == 1]
 voivodeship = ''
 pkd_section = ''
 
-# TIMELINE DATA
-timeline_mock_df = surv_removed_df[
-    (surv_removed_df['MainAddressVoivodeship'] == 'mazowieckie') & (surv_removed_df['PKDMainSection'] == 'G')]
-
-timeline_mock_df = pd.DataFrame(
-    {'count': timeline_mock_df.groupby("YearOfTermination").size()}).reset_index()
-
-map_type_options = ['Active companies', '% of terminated companies']
-
 # Treemap init
 pkd_fig = build_pkd_treemap()
 
@@ -237,8 +228,14 @@ def redraw_timeline(year, voivodeship, pkd_section):
             # division (eg. 47)
             data = data[data['PKDMainDivision'] == float(pkd_section)]
 
-    data = pd.DataFrame({'count': data.groupby("YearOfTermination").size()}).reset_index()
-    return [event_timeline.build_event_timeline(data, year)]
+    monthly_data = pd.DataFrame({
+        'count': data \
+            .assign(MonthOfTermination = pd.to_datetime(pd.to_datetime(data.DateOfTermination).dt.to_period('M').astype(str), format='%Y-%m')) \
+            .groupby(["YearOfTermination", "MonthOfTermination"]) \
+            .size()
+    }).reset_index()
+    
+    return [event_timeline.build_event_timeline(monthly_data, year)]
 
 
 if __name__ == '__main__':
