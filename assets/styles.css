@@ -24,13 +24,13 @@
 }
 
 .top {
-  background: #f9f9f9;
+  background: #ffffff;
   height: 60%;
   width: 100%;
 }
 .bottom {
   height: 30%;
-  background: #f9f9f9;
+  background: #ffffff;
   width: 100%;
 }
 
@@ -51,4 +51,17 @@
 
 #year-slider{
   margin: 3vh 0 0 0;
+}
+
+#map-type-radiobuttons{
+  display: inline-block;
+  margin: 0.15rem 0 0 1rem;
+}
+
+.map-type-radiobuttons-items{
+    margin: 0 0 0 1rem;
+}
+
+#guide-button{
+    margin: 1rem 0 0 1rem;
 }

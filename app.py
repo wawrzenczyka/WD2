@@ -86,7 +86,7 @@ app.layout = html.Div([
                             dbc.Col(md=2,
                                     children=html.H3("Rok:", id='year')
                                     ),
-                            dbc.Col(md=8,
+                            dbc.Col(md=7,
                                     children=daq.Slider(
                                         color="default",
                                         id='year-slider',
@@ -100,15 +100,13 @@ app.layout = html.Div([
                                         targets=event_timeline.EVENTS_SLIDER,
                                     ),
                                     ),
-                            dbc.Col(md=2,
+                            dbc.Col(md=3,
                                     children=[
-                                        html.A(
+                                        dbc.Button(
+                                            id='guide-button',
                                             href="javascript:customStartIntro();",
-                                            children="Start tour",
-                                            style={
-                                                'text-size': '40pt',
-                                                'padding-bottom': '40px'
-                                            }
+                                            children="Przewodnik po aplikacji",
+                                            color='info'
                                         )
                                     ]
                                     )
@@ -122,29 +120,21 @@ app.layout = html.Div([
                                     className='box',
                                     children=[
                                         dbc.Row(
+                                            id='map-filters',
                                             no_gutters=True,
                                             children=[
-                                                dbc.Col(md=6,
-                                                        id='map-filters',
-                                                        className='fill-height',
-                                                        children=[
-                                                            html.H5('Filter:'),
-                                                            dcc.RadioItems(
-                                                                id='map-type-radiobuttons',
-                                                                options=[
-                                                                    {'label': 'Active companies',
-                                                                     'value': 0},
-                                                                    {'label': '% of terminated companies',
-                                                                     'value': 1}
-                                                                ],
-                                                                value=0,
-                                                                labelStyle={
-                                                                    'display': 'inline-block',
-                                                                    'padding': 5
-                                                                }
-                                                            )
-                                                        ]
-                                                        )
+                                                html.H5('Filtry:'),
+                                                dcc.RadioItems(
+                                                    id='map-type-radiobuttons',
+                                                    labelClassName='map-type-radiobuttons-items',
+                                                    options=[
+                                                        {'label': 'Liczba aktywnych firm',
+                                                         'value': 0},
+                                                        {'label': '% zamkniętych firm',
+                                                         'value': 1}
+                                                    ],
+                                                    value=0
+                                                )
                                             ]
                                         ),
                                         dcc.Graph(
