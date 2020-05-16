@@ -114,7 +114,7 @@ def build_event_timeline(timeline_mock_df, year):
                 'xanchor': 'center',
                 'yanchor': 'top'
             },
-        margin=dict(l=100, r=60, t=30, b=0),
+        margin=dict(l=100, r=60, t=30, b=0)
     )
 
     return fig

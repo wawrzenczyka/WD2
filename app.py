@@ -152,8 +152,12 @@ app.layout = html.Div([
                                     className='box',
                                     children=[
                                         dcc.Graph(
-                                            className='fill-height',
                                             id='timeline',
+                                            className='fill-height',
+                                            config={
+                                                'displayModeBar': False,
+                                                'scrollZoom': False
+                                            },
                                         )
                                     ]
                                     )
