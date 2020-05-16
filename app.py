@@ -184,108 +184,114 @@ app.layout = html.Div([
                 ]
             )]
     ),
+    html.Hr(),
     html.Div(
         className='screen-height',
-        children=[html.Div(
-            id='prediction',
-            style={'text-align': 'center'},
-            children=[
-                html.H1(children='Ile przetrwa twój biznes?', style={'font-weight': 'bold'}),
+        children=[
+            html.Div(
+                id='prediction',
+                style={'text-align': 'center'},
+                children=[
+                    html.H1(
+                        id='prediction-header',
+                        children='Ile przetrwa twój biznes?'
+                    ),
 
-                html.Plaintext("Jestem ", style={'display': 'inline-block', 'font-size': '12pt'}),
-                dcc.Dropdown(
-                    id='sex',
-                    options=SEX_MAPPING,
-                    value='M',
-                    style=dict(
-                        width=100,
-                        display='inline-block',
-                        verticalAlign="middle"
-                    )
-                ),
-
-                html.Plaintext(", mam ", style={'display': 'inline-block', 'font-size': '12pt'}),
-                dcc.Dropdown(
-                    id='business-type',
-                    options=BUISSNES_MAPPING,
-                    value='Q_86',
-                    style=dict(
-                        width=210,
-                        display='inline-block',
-                        verticalAlign="middle"
-                    )
-                ),
-
-                html.Plaintext(", jestem z województwa ", style={'display': 'inline-block', 'font-size': '12pt'}),
-                dcc.Dropdown(
-                    id='voivodeship',
-                    options=VOIVODESHIPS_MAPPING,
-                    value='mazowieckie',
-                    style=dict(
-                        width=190,
-                        display='inline-block',
-                        verticalAlign="middle"
-                    )
-                ),
-
-                html.Div([
-                    html.Plaintext(" i ", style={'display': 'inline-block', 'font-size': '12pt'}),
-
+                    html.Plaintext("Jestem ", style={'display': 'inline-block', 'font-size': '12pt'}),
                     dcc.Dropdown(
-                        id='is_licence',
+                        id='sex',
+                        options=SEX_MAPPING,
+                        value='M',
+                        style=dict(
+                            width=100,
+                            display='inline-block',
+                            verticalAlign="middle"
+                        )
+                    ),
+
+                    html.Plaintext(", mam ", style={'display': 'inline-block', 'font-size': '12pt'}),
+                    dcc.Dropdown(
+                        id='business-type',
+                        options=BUISSNES_MAPPING,
+                        value='Q_86',
+                        style=dict(
+                            width=210,
+                            display='inline-block',
+                            verticalAlign="middle"
+                        )
+                    ),
+
+                    html.Plaintext(", jestem z województwa ", style={'display': 'inline-block', 'font-size': '12pt'}),
+                    dcc.Dropdown(
+                        id='voivodeship',
+                        options=VOIVODESHIPS_MAPPING,
+                        value='mazowieckie',
+                        style=dict(
+                            width=190,
+                            display='inline-block',
+                            verticalAlign="middle"
+                        )
+                    ),
+
+                    html.Div([
+                        html.Plaintext(" i ", style={'display': 'inline-block', 'font-size': '12pt'}),
+
+                        dcc.Dropdown(
+                            id='is_licence',
+                            options=[
+                                {'label': 'mam licencje', 'value': 1},
+                                {'label': 'nie mam licencji', 'value': 0},
+                            ],
+                            value=0,
+                            style=dict(
+                                width=135,
+                                display='inline-block',
+                                verticalAlign="middle",
+                                padding='0',
+                            )
+                        ),
+                    ], id='to_hide', style={'display': 'inline-block'},
+
+                    ),
+
+                    html.Plaintext(". ", style={'display': 'inline-block', 'font-size': '12pt'}),
+                    dcc.Dropdown(
+                        id='is_shareholder',
                         options=[
-                            {'label': 'mam licencje', 'value': 1},
-                            {'label': 'nie mam licencji', 'value': 0},
+                            {'label': 'Posiadam udziały', 'value': 1},
+                            {'label': 'Nie posiadam udziałów', 'value': 0},
                         ],
                         value=0,
                         style=dict(
-                            width=135,
+                            width=185,
                             display='inline-block',
                             verticalAlign="middle",
                             padding='0',
                         )
                     ),
-                ], id='to_hide', style={'display': 'inline-block'},
+                    html.Plaintext(" w innych firmach. ", style={'display': 'inline-block', 'font-size': '12pt'}),
 
-                ),
+                    html.Div([
+                        html.Plaintext("Mój e-mail to ", style={'display': 'inline-block', 'font-size': '12pt'}),
+                        dcc.Input(id="email", type="text", value="", placeholder="",
+                                  style=dict(display='inline-block')),
+                        html.Plaintext(", mój numer telefonu to ",
+                                       style={'display': 'inline-block', 'font-size': '12pt'}),
+                        dcc.Input(id="phone_number", type="text", value="",
+                                  placeholder="", style=dict(display='inline-block')),
+                        html.Plaintext(". ", style={'display': 'inline-block', 'font-size': '12pt'}),
+                    ]),
 
-                html.Plaintext(". ", style={'display': 'inline-block', 'font-size': '12pt'}),
-                dcc.Dropdown(
-                    id='is_shareholder',
-                    options=[
-                        {'label': 'Posiadam udziały', 'value': 1},
-                        {'label': 'Nie posiadam udziałów', 'value': 0},
-                    ],
-                    value=0,
-                    style=dict(
-                        width=185,
-                        display='inline-block',
-                        verticalAlign="middle",
-                        padding='0',
-                    )
-                ),
-                html.Plaintext(" w innych firmach. ", style={'display': 'inline-block', 'font-size': '12pt'}),
+                    html.Plaintext("Twoja firma przetrwa", style={
+                        'display': 'block', 'text-align': 'center', 'font-size': '14pt', 'margin-top': '100px',
+                        'margin-bottom': '0px'}),
+                    html.Div(id="prediction-output"),
 
-                html.Div([
-                    html.Plaintext("Mój e-mail to ", style={'display': 'inline-block', 'font-size': '12pt'}),
-                    dcc.Input(id="email", type="text", value="", placeholder="",
-                              style=dict(display='inline-block')),
-                    html.Plaintext(", mój numer telefonu to ", style={'display': 'inline-block', 'font-size': '12pt'}),
-                    dcc.Input(id="phone_number", type="text", value="",
-                              placeholder="", style=dict(display='inline-block')),
-                    html.Plaintext(". ", style={'display': 'inline-block', 'font-size': '12pt'}),
-                ]),
+                    html.Hr(),
 
-                html.Plaintext("Twoja firma przetrwa", style={
-                    'display': 'block', 'text-align': 'center', 'font-size': '14pt', 'margin-top': '100px',
-                    'margin-bottom': '0px'}),
-                html.Div(id="prediction-output"),
-
-                html.Hr(),
-
-                dcc.Graph(id='bankrupcy_proba-graph')
-            ]
-        )]
+                    dcc.Graph(id='bankrupcy_proba-graph')
+                ]
+            )]
 
     )
 ])
@@ -469,7 +475,7 @@ def plot_proba(sex, PKD_Div_Sec, voivodeship, licence, shareholder, email, phone
                    '72-83', '84-95', '96+'], 'y': proba, 'type': 'bar'},
         ],
         'layout': {
-            'title': 'Prawdopodobieństwo upadku firmy w przedziałach miesięcznych'
+            'title': 'Prawdopodobieństwo upadku firmy w przedziałach miesięcznych',
         }
     }
 

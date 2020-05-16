@@ -65,3 +65,8 @@
 #guide-button{
     margin: 1rem 0 0 1rem;
 }
+
+#prediction-header{
+  padding: 5vh 0 5vh 0;
+  font-weight: bold;
+}
