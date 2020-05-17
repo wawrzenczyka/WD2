@@ -15,15 +15,6 @@ from joblib import load
 
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
-<<<<<<< HEAD
-# Init app
-app = dash.Dash(__name__, external_stylesheets=[
-    dbc.themes.BOOTSTRAP,
-    './first-tab.css'
-])
-
-server = app.server
-=======
 BUISSNES_MAPPING = [
     {'label': 'studio fizjoterapeutyczne', 'value': 'Q_86'},
     {'label': 'biuro księgowe', 'value': 'M_69'},
@@ -38,7 +29,6 @@ SEX_MAPPING = [
     {'label': 'kobietą', 'value': 'F'},
     {'label': 'mężczyzną', 'value': 'M'}
 ]
->>>>>>> feature/optim_csv
 
 VOIVODESHIPS_MAPPING = [
     {'label': 'Mazowieckiego', 'value': 'mazowieckie'},
@@ -69,6 +59,8 @@ app = dash.Dash(__name__, external_stylesheets=[
     dbc.themes.BOOTSTRAP,
     './styles.css'
 ])
+
+server = app.server
 
 # PREDICTION MODEL
 clf = load('model.joblib')
