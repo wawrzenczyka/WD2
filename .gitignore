@@ -1,3 +1,6 @@
+# Some csv
+data/ceidg_data_surv_formatted.csv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

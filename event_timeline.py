@@ -40,7 +40,7 @@ def build_event_timeline(monthly_data, year):
             years = [year]
             x_label = datetime.datetime.strptime(str(int(year)) + '-01', '%Y-%m')
 
-        y = monthly_data[monthly_data['MonthOfTermination'] == x_label]['count'].mean()
+        y = monthly_data[monthly_data['MonthOfTermination'] == x_label]['Count'].mean()
         
         fig.add_trace(
             go.Scatter(
@@ -81,7 +81,7 @@ def build_event_timeline(monthly_data, year):
             years = [year]
             x_label = datetime.datetime.strptime(str(int(np.mean(year))) + '-01', '%Y-%m')
 
-        y = monthly_data[monthly_data['MonthOfTermination'] == x_label]['count'].mean()
+        y = monthly_data[monthly_data['MonthOfTermination'] == x_label]['Count'].mean()
 
         fig.add_trace(
             go.Scatter(
@@ -99,7 +99,7 @@ def build_event_timeline(monthly_data, year):
     fig.add_trace(
         go.Scatter(
             x=monthly_data['MonthOfTermination'],
-            y=monthly_data['count'],
+            y=monthly_data['Count'],
             mode='lines',
             name='lines',
             showlegend=False,
