@@ -369,7 +369,7 @@ def select_pkd_section(click, mapClick, old):
     ])
 def redraw_treemap(voivodeship):
     voivodeship = [voiv.lower() for voiv in voivodeship]
-    return build_pkd_treemap(voivodeship=voivodeship)
+    return [build_pkd_treemap(voivodeship=voivodeship)]
 
 @app.callback(
     [
