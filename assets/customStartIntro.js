@@ -148,7 +148,7 @@ function customStartIntro(){
             element: '#prediction-input',
             intro: '<b>Predykcja - wprowadzanie danych</b><br> \
               Wypełnij pola by sprawdzić ile przetrwa Twój biznes!',
-            position: 'bottom'
+            position: 'right'
           },
           {
             element: '#pred-output',
@@ -159,17 +159,22 @@ function customStartIntro(){
           }
         ]
       });
-      // intro.onbeforechange(function(targetElement) {
-      //   switch (targetElement.id){
-      //     case "pkd-tree":
-      //       console.log('pkd-tree')
-      //       $('.introjs-arrow').css({display: 'none'});
-      //       break;
-      //     default:
-      //       console.log('default')
-      //       $('.introjs-arrow').css({display: 'block'});
-      //   } 
-      // });
+      intro.onbeforechange(function(targetElement) {
+        switch (targetElement.id){
+          case "pkd-tree":
+            $('.introjs-arrow').attr('style','opacity: 0 !important;');
+            break;
+          case "prediction-input":
+            $('.introjs-arrow').attr('style','opacity: 0 !important;');
+            break;
+          case "pred-output":
+            $('.introjs-arrow').attr('style','opacity: 0 !important;');
+            break;
+          default:
+            console.log('default')
+            $('.introjs-arrow').css({opacity: 1});
+        } 
+      });
       intro.start();
   } 
 
