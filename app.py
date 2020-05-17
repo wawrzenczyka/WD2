@@ -16,6 +16,10 @@ THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
 surv_df = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'ceidg_data_formated.csv'), encoding="utf-8")
 surv_removed_df = surv_df[surv_df['Terminated'] == 1]
+surv_removed_df = surv_removed_df.assign(MonthOfTermination=pd.to_datetime(pd.to_datetime(surv_removed_df.DateOfTermination).dt.to_period('M').astype(str), format='%Y-%m'))
+full_daterange = pd.DataFrame({
+        'MonthOfTermination': pd.date_range(start='2011-01-01', end='2020-01-02', freq='MS')
+    })
 
 # Global first-page variables
 voivodeship = ''
@@ -226,14 +230,17 @@ def redraw_timeline(year, voivodeship, pkd_section):
             # division (eg. 47)
             data = data[data['PKDMainDivision'] == float(pkd_section)]
 
-    monthly_data = pd.DataFrame({
-        'count': data \
-            .assign(MonthOfTermination = pd.to_datetime(pd.to_datetime(data.DateOfTermination).dt.to_period('M').astype(str), format='%Y-%m')) \
-            .groupby(["YearOfTermination", "MonthOfTermination"]) \
-            .size()
-    }).reset_index()
+    monthly_data = data[["MonthOfTermination", "Count"]]\
+        .groupby(["MonthOfTermination"])\
+        .sum().reset_index()
+
+    monthly_data_filled = full_daterange.merge(
+        monthly_data,
+        on='MonthOfTermination',
+        how='left'
+    ).fillna(0)
     
-    return [event_timeline.build_event_timeline(monthly_data, year)]
+    return [event_timeline.build_event_timeline(monthly_data_filled, year)]
 
 
 if __name__ == '__main__':
