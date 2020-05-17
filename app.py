@@ -5,11 +5,8 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 import dash_daq as daq
 from dash.dependencies import Input, Output, State
-import plotly.express as px
 import pandas as pd
 import numpy as np
-import json
-import ceidg_dataset
 from treemap_helper import build_pkd_treemap
 from map_helper import build_map
 import event_timeline
@@ -42,23 +39,16 @@ VOIVODESHIPS_MAPPING = [
 ]
 
 # LOAD DATA
-surv_df = ceidg_dataset.load()
+surv_df = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'ceidg_data_formated.csv'), encoding="utf-8")
 surv_removed_df = surv_df[surv_df['Terminated'] == 1]
+surv_removed_df = surv_removed_df.assign(MonthOfTermination=pd.to_datetime(pd.to_datetime(surv_removed_df.DateOfTermination).dt.to_period('M').astype(str), format='%Y-%m'))
+full_daterange = pd.DataFrame({
+        'MonthOfTermination': pd.date_range(start='2011-01-01', end='2020-01-02', freq='MS')
+    })
 
 # Global first-page variables
 voivodeship = ''
 pkd_section = ''
-
-# TIMELINE DATA
-timeline_mock_df = surv_removed_df[
-    (surv_removed_df['MainAddressVoivodeship'] == 'mazowieckie') & (surv_removed_df['PKDMainSection'] == 'G')]
-
-timeline_mock_df = pd.DataFrame(
-    {'count': timeline_mock_df.groupby("YearOfTermination").size()}).reset_index()
-
-# MAP
-with open(os.path.join(THIS_FOLDER, 'assets', 'wojewodztwa-min.geojson'), encoding='utf8') as woj_json:
-    wojewodztwa_geo = json.load(woj_json)
 
 map_type_options = ['Active companies', '% of terminated companies']
 
@@ -69,6 +59,8 @@ app = dash.Dash(__name__, external_stylesheets=[
     dbc.themes.BOOTSTRAP,
     './styles.css'
 ])
+
+server = app.server
 
 # PREDICTION MODEL
 clf = load('model.joblib')
@@ -305,7 +297,7 @@ app.layout = html.Div([
         Input('selected-voivodeship-indices', 'children'),
     ])
 def update_map(year, map_type, selceted_voivodeships):
-    return build_map(int(year), map_type, surv_df, wojewodztwa_geo, selceted_voivodeships)
+    return build_map(int(year), map_type, selceted_voivodeships)
 
 
 @app.callback(
@@ -332,7 +324,7 @@ def select_voivodeship(selectedVoivodeship):
     ],
     [
         Input('pkd-tree', 'clickData'),
-        Input('map', 'clickData'),
+        Input('map', 'selectedData'),
     ],
     [
         State('selected-pkd-section', 'children')
@@ -370,7 +362,6 @@ def select_pkd_section(click, mapClick, old):
 
     return [selected_section]
 
-
 @app.callback(
     [
         Output('pkd-tree', 'figure'),
@@ -379,8 +370,8 @@ def select_pkd_section(click, mapClick, old):
         Input('selected-voivodeship', 'children'),
     ])
 def redraw_treemap(voivodeship):
-    return build_pkd_treemap(voivodeship=voivodeship),
-
+    voivodeship = [voiv.lower() for voiv in voivodeship]
+    return [build_pkd_treemap(voivodeship=voivodeship)]
 
 @app.callback(
     [
@@ -405,9 +396,17 @@ def redraw_timeline(year, voivodeship, pkd_section):
             # division (eg. 47)
             data = data[data['PKDMainDivision'] == float(pkd_section)]
 
-    data = pd.DataFrame({'count': data.groupby(
-        "YearOfTermination").size()}).reset_index()
-    return [event_timeline.build_event_timeline(data, year)]
+    monthly_data = data[["MonthOfTermination", "Count"]]\
+        .groupby(["MonthOfTermination"])\
+        .sum().reset_index()
+
+    monthly_data_filled = full_daterange.merge(
+        monthly_data,
+        on='MonthOfTermination',
+        how='left'
+    ).fillna(0)
+
+    return [event_timeline.build_event_timeline(monthly_data_filled, year)]
 
 
 # PREDICTION CALLBACKS

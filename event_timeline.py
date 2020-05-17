@@ -4,6 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 import numpy as np
+import datetime
 
 EVENTS_SLIDER = {
     2013: {"label": 'Nowe podatki', 'style': {"color": "#CD5C5C"}},
@@ -28,20 +29,22 @@ EVENTS_DESCRIPTION = {
 }
 
 
-def build_event_timeline(timeline_mock_df, year):
+def build_event_timeline(monthly_data, year):
     fig = go.Figure()
 
     if year in EVENTS_SLIDER:
         if year > int(year):
             years = [year - 0.5, year + 0.5]
+            x_label = datetime.datetime.strptime(str(int(year)) + '-06', '%Y-%m')
         else:
             years = [year]
+            x_label = datetime.datetime.strptime(str(int(year)) + '-01', '%Y-%m')
 
-        y = timeline_mock_df[timeline_mock_df['YearOfTermination'].isin(years)]['count'].mean()
-
+        y = monthly_data[monthly_data['MonthOfTermination'] == x_label]['Count'].mean()
+        
         fig.add_trace(
             go.Scatter(
-                x=[np.mean(year)],
+                x=[x_label],
                 y=[y],
                 mode='markers',
                 name='markers',
@@ -52,7 +55,7 @@ def build_event_timeline(timeline_mock_df, year):
         )
 
         fig.add_annotation(
-            x=np.mean(year),
+            x=x_label,
             y=y,
             text=EVENTS_SLIDER[year]['label'],
             showarrow=True,
@@ -73,14 +76,16 @@ def build_event_timeline(timeline_mock_df, year):
     for year in EVENTS_SLIDER.keys():
         if year > int(year):
             years = [year - 0.5, year + 0.5]
+            x_label = datetime.datetime.strptime(str(int(np.mean(year))) + '-06', '%Y-%m')
         else:
             years = [year]
+            x_label = datetime.datetime.strptime(str(int(np.mean(year))) + '-01', '%Y-%m')
 
-        y = timeline_mock_df[timeline_mock_df['YearOfTermination'].isin(years)]['count'].mean()
+        y = monthly_data[monthly_data['MonthOfTermination'] == x_label]['Count'].mean()
 
         fig.add_trace(
             go.Scatter(
-                x=[np.mean(year)],
+                x=[x_label],
                 y=[y],
                 mode='markers',
                 name='markers',
@@ -93,8 +98,8 @@ def build_event_timeline(timeline_mock_df, year):
 
     fig.add_trace(
         go.Scatter(
-            x=timeline_mock_df['YearOfTermination'],
-            y=timeline_mock_df['count'],
+            x=monthly_data['MonthOfTermination'],
+            y=monthly_data['Count'],
             mode='lines',
             name='lines',
             showlegend=False,
