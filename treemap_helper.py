@@ -5,20 +5,8 @@ import os
 
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
-__df = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'ceidg_data_surv.csv')).dropna()
-__pkd_data = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'pkd.csv'), sep=';', encoding='UTF-8')
-__pkd_data['typ'] = \
-    np.where(__pkd_data.symbol.str.match(r'^[A-Z]+$'),
-             'PKDMainSection', \
-             np.where(__pkd_data.symbol.str.match(r'^[0-9]+$'),
-                      'PKDMainDivision', \
-                      np.where(__pkd_data.symbol.str.match(r'^[0-9]+.[0-9]$'),
-                               'PKDMainGroup', \
-                               'PKDMainClass')
-                      ))
-__pkd_data['symbol'] = __pkd_data.symbol.str.replace(r'^0+', '').str.replace(r'\.', '')
-__pkd_names = __pkd_data.loc[~__pkd_data.symbol.str.contains('([0-9]+)[A-Z]$'), :] \
-    [['symbol', 'nazwa', 'typ']]
+__df = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'ceidg_data_formated.csv'))
+__pkd_names = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'pkd_data.csv'), encoding='UTF-8')
 
 
 def __build_hierarchical_dataframe(df, pkd_names, levels, value_column, color_columns=None):
@@ -131,20 +119,17 @@ def build_pkd_treemap(voivodeship=[]):
         df = df.loc[np.isin(df.MainAddressVoivodeship, voivodeship), :].reset_index(drop=False)
 
     pkd_names = __pkd_names
-    pkd_aggregate = \
-        df.assign(ones=1)
 
     levels = ['PKDMainSection',
               'PKDMainDivision']  # levels used for the hierarchical chart
     color_columns = ['DurationOfExistenceInMonths']
-    value_column = 'ones'
+    value_column = 'Count'
 
-    df_all_trees = __build_hierarchical_dataframe(pkd_aggregate, pkd_names, levels, value_column, color_columns)
+    df_all_trees = __build_hierarchical_dataframe(df, pkd_names, levels, value_column, color_columns)
 
     df_all_trees = __format_strings(df_all_trees)
 
     median_duration = df_all_trees['color'].median()
-    min_duration = df_all_trees['color'].min()
     max_duration = df_all_trees['color'].max()
 
     pkd_fig = go.Figure(go.Treemap(

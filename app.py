@@ -201,6 +201,7 @@ def select_pkd_section(click, mapClick, old):
         Input('selected-voivodeship', 'children'),
     ])
 def redraw_treemap(voivodeship):
+    voivodeship = [voiv.lower() for voiv in voivodeship]
     return build_pkd_treemap(voivodeship=voivodeship),
 
 @app.callback(
