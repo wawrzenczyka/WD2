@@ -133,3 +133,9 @@ dmypy.json
 
 # Pycharm files
 .idea/
+
+venv
+*.pyc
+.DS_Store
+.env
+ceidg_data_surv_formatted.csv

@@ -60,6 +60,8 @@ app = dash.Dash(__name__, external_stylesheets=[
     './styles.css'
 ])
 
+server = app.server
+
 # PREDICTION MODEL
 clf = load('model.joblib')
 
