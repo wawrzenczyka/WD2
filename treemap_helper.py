@@ -130,6 +130,7 @@ def build_pkd_treemap(voivodeship=[]):
     df_all_trees = __format_strings(df_all_trees)
 
     median_duration = df_all_trees['color'].median()
+    min_duration = df_all_trees['color'].min()
     max_duration = df_all_trees['color'].max()
 
     pkd_fig = go.Figure(go.Treemap(
@@ -157,7 +158,8 @@ def build_pkd_treemap(voivodeship=[]):
             'x': 0.5,
             'xanchor': 'center',
             'yanchor': 'top'
-        }
+        },
+        margin=dict(l=20, r=20, t=70, b=20),
     )
 
     return pkd_fig
