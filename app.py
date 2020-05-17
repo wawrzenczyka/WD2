@@ -50,17 +50,6 @@ full_daterange = pd.DataFrame({
 voivodeship = ''
 pkd_section = ''
 
-# TIMELINE DATA
-timeline_mock_df = surv_removed_df[
-    (surv_removed_df['MainAddressVoivodeship'] == 'mazowieckie') & (surv_removed_df['PKDMainSection'] == 'G')]
-
-timeline_mock_df = pd.DataFrame(
-    {'count': timeline_mock_df.groupby("YearOfTermination").size()}).reset_index()
-
-# MAP
-with open(os.path.join(THIS_FOLDER, 'assets', 'wojewodztwa-min.geojson'), encoding='utf8') as woj_json:
-    wojewodztwa_geo = json.load(woj_json)
-
 map_type_options = ['Active companies', '% of terminated companies']
 
 # Treemap init
@@ -379,7 +368,8 @@ def select_pkd_section(click, mapClick, old):
         Input('selected-voivodeship', 'children'),
     ])
 def redraw_treemap(voivodeship):
-    return build_pkd_treemap(voivodeship=voivodeship),
+    voivodeship = [voiv.lower() for voiv in voivodeship]
+    return build_pkd_treemap(voivodeship=voivodeship)
 
 @app.callback(
     [
