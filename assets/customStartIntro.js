@@ -15,11 +15,11 @@ function customStartIntro(){
           {
             element: '#map-filters',
             intro: "<b>Filtr danych</b><hr> \
-              <div><input type='checkbox' id='ac' value><label for='ac'>Active companies</label></div> \
+              <div><input type='checkbox' id='ac' value disabled><label for='ac'>Active companies</label></div> \
               Wyświetla na poniższej mapie informację o liczbie \
               aktywnych działalności gospodarczych w danym województwie.<hr> \
-              <div><input type='checkbox' id='percent' value><label for='percent'>% of terminated companies</label></div> \
-              Wyświetla odsetek działalności upadłych w danym województwie, do roku zaznaczonego na osi czasu",
+              <div><input type='checkbox' id='percent' value disabled><label for='percent'>% of terminated companies</label></div> \
+              Wyświetla odsetek działalności upadłych w danym województwie, do roku zaznaczonego na osi czasu.",
             position: 'right'
           },
           {
@@ -69,7 +69,7 @@ function customStartIntro(){
                 Jeżeli zaznaczone było więcej niż jedno województwo, należy kliknąć dwukrotnie.</p> \
               </div>\
               <div id="data" class="tabcontent">\
-                <p>Kartogram przedstawia liczbę aktywnych firm lub odsetek upadłych (w zależności od wybranej powyżej opcji), w podziale na województa. \
+                <p>Kartogram przedstawia liczbę aktywnych firm lub odsetek upadłych (w zależności od wybranej powyżej opcji), w podziale na województwa. \
                 Dane aktualizują się, przedstawiając zawsze stan z roku wybranego na osi czasu.</p>\
               </div>\
               <div id="features" class="tabcontent">\
@@ -129,33 +129,33 @@ function customStartIntro(){
             </div>\
             <div id="usage" class="tabcontent" style="display: block;">\
               <p>Aby <b>wybrać</b> interesującą nas sekcję lub dywizję PKD należy w nią kliknąć <u>lewym przyciskiem myszy</u>.</p><hr> \
-              <p>Ponowne kliknięcie spowoduje odznaczenie i powrót do bardziej ogólnego widoku</p><hr> \
+              <p>Ponowne kliknięcie spowoduje odznaczenie i powrót do bardziej ogólnego widoku.</p><hr> \
               <p>Po najechaniu myszką na obszar pojawia się nazwa sekcji/dywizji oraz konkretne dane liczbowe.</p> \
             </div>\
             <div id="data" class="tabcontent"> \
-              <p>Kolorem pokazany jest średni czas życia działaności w danej sekcji PKD.</p><hr> \
+              <p>Kolorem pokazany jest średni czas życia działalności w danej sekcji PKD.</p><hr> \
               <p>Pole prostokąta oddaje ilość powstałych w danej sekcji firm.</p><hr> \
               <p><b>Klikając</b> w daną sekcję można wyświetlić szczegółowe informacje o jej dywizjach.</p> \
               </div>\
             <div id="features" class="tabcontent">\
-              <p>Zaznaczenie sekcji/dywizji sposoduje, że na powyższym wykresie umieralności firm zostaną wyświetlone tylko dane \
+              <p>Zaznaczenie sekcji/dywizji spowoduje, że na powyższym wykresie umieralności firm zostaną wyświetlone tylko dane \
               dotyczące wybranej sekcji/dywizji.</p><hr> \
               <p>Brak zaznaczenia jest równoważny zaznaczeniu wszystkich sekcji i dywizji jednocześnie.</p>\
             </div>',
-            position: 'auto'
+            position: 'top'
           },
           {
             element: '#prediction-input',
             intro: '<b>Predykcja - wprowadzanie danych</b><br> \
               Wypełnij pola by sprawdzić ile przetrwa Twój biznes!',
-            position: 'right'
+            position: 'bottom'
           },
           {
             element: '#pred-output',
             intro: '<b>Predykcja - wyniki</b><br> \
-              <p>Prognozy co do przetrwania Twojej firmy wyglądają następująco.</p><hr> \
-              <p>Wykres przedstawia prawdopodobieństwo upadku Twojej działaności w kolejnych latach.</p>',
-            position: 'auto'
+              <p>Prognozy co do przetrwania Twojej firmy znajdują się poniżej.</p><hr> \
+              <p>Wykres przedstawia prawdopodobieństwo upadku Twojej działalności w kolejnych latach.</p>',
+            position: 'bottom'
           }
         ]
       });
