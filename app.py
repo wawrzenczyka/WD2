@@ -322,7 +322,7 @@ def select_voivodeship(selectedVoivodeship):
     ],
     [
         Input('pkd-tree', 'clickData'),
-        Input('map', 'clickData'),
+        Input('map', 'selectedData'),
     ],
     [
         State('selected-pkd-section', 'children')
