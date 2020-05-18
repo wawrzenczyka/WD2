@@ -209,7 +209,8 @@ app.layout = html.Div([
                             style=dict(
                                 width=100,
                                 display='inline-block',
-                                verticalAlign="middle"
+                                verticalAlign="middle",
+                                textAlign="left"
                             )
                         ),
 
@@ -222,7 +223,8 @@ app.layout = html.Div([
                             style=dict(
                                 width=210,
                                 display='inline-block',
-                                verticalAlign="middle"
+                                verticalAlign="middle",
+                                textAlign="left"
                             )
                         ),
 
@@ -235,7 +237,8 @@ app.layout = html.Div([
                             style=dict(
                                 width=190,
                                 display='inline-block',
-                                verticalAlign="middle"
+                                verticalAlign="middle",
+                                textAlign="left"
                             )
                         ),
 
@@ -255,6 +258,7 @@ app.layout = html.Div([
                                     display='inline-block',
                                     verticalAlign="middle",
                                     padding='0',
+                                    textAlign="left"
                                 )
                             ),
                         ], id='to_hide', style={'display': 'inline-block'},
@@ -275,6 +279,7 @@ app.layout = html.Div([
                                 display='inline-block',
                                 verticalAlign="middle",
                                 padding='0',
+                                textAlign="left"
                             )
                         ),
                         html.Plaintext(" w innych firmach. ", style={
