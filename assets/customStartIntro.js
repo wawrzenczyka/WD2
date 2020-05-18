@@ -15,10 +15,10 @@ function customStartIntro(){
           {
             element: '#map-filters',
             intro: "<b>Filtr danych</b><hr> \
-              <div><input type='checkbox' id='ac' value disabled><label for='ac'>Active companies</label></div> \
+              <div><input type='checkbox' id='ac' value disabled><label for='ac'>Liczba aktywnych firm</label></div> \
               Wyświetla na poniższej mapie informację o liczbie \
               aktywnych działalności gospodarczych w danym województwie.<hr> \
-              <div><input type='checkbox' id='percent' value disabled><label for='percent'>% of terminated companies</label></div> \
+              <div><input type='checkbox' id='percent' value disabled><label for='percent'>% zamkniętych firm</label></div> \
               Wyświetla odsetek działalności upadłych w danym województwie, do roku zaznaczonego na osi czasu.",
             position: 'right'
           },
