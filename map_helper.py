@@ -38,10 +38,10 @@ def build_map(
     label_text = df.round(2).TerminatedPercentage.astype(str) + '%' if map['color'] == 'TerminatedPercentage' else df[
         'active'].astype(str)
 
-    colorscale = 'Viridis'
+    colorscale = 'Balance'
     y = df[map['color']] / map['max']
-    black_indexes, *_ = np.where(y > 0.5)
-    white_indexes, *_ = np.where(y <= 0.5)
+    black_indexes, *_ = np.where((0.75 >= y) & (y >= 0.25))
+    white_indexes, *_ = np.where((y > 0.75) | (y < 0.25))
 
     fig = go.Figure()
 
