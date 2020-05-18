@@ -9,19 +9,19 @@ import datetime
 # wanted style {"color": 'darkblue', "font-size": 10, "line-height": 10, "font-weight": 200}
 
 EVENTS_SLIDER = {
-    2013: {"label": 'Nowe podatki', "date": "2013-01-01" ,'style': {"color": 'darkblue'}},
+    2013: {"label": 'Nowe podatki', "date": "2012-07-01" ,'style': {"color": 'darkblue'}},
     2014: {"label": 'Upadki skoków', "date": "2014-05-01" , 'style': {"color": 'darkblue'}},
-    2016: {"label": 'Zaostrzenie przepisów', "date": "2015-11-01" , 'style': {"color": 'darkblue'}},
-    2016.5: {"label": 'Nowe podatki', "date": "2016-06-01" , 'style': {"color": 'darkblue'}},
-    2017: {"label": 'Kontrole rolników', "date": "2017-01-01" , 'style': {"color": 'darkblue'}},
+    2016: {"label": 'Zaostrzenie przepisów', "date": "2015-04-01" , 'style': {"color": 'darkblue'}},
+    2016.5: {"label": 'Nowe podatki', "date": "2015-10-01" , 'style': {"color": 'darkblue'}},
+    2017: {"label": 'Kontrole rolników', "date": "2016-07-01" , 'style': {"color": 'darkblue'}},
 }
 
 EVENTS_DESCRIPTION = {
-    "2013-01-01": 'nowe wartości stóp procentowych',
+    "2012-07-01": 'nowe wartości stóp procentowych',
     "2014-05-01": 'upadki instytucji finansowych spółdzielczej kasy oszczędnościowo-kredytowej',
-    "2015-11-01": 'Prawo działalności gospodarczej zastępuje ustawę o swobodzie działalności gospodarczej,',
-    "2016-06-01": 'nowa interpretacja przepisów podatkowych. Koszt pracy wlasciciela nie mogą stanowić kosztów uzyskania przychodu',
-    "2017-01-01": 'ośrodki doradztwa roliniczego nie podlegają wojewodom a bezpośrednio ministerstwu rolnictwa',
+    "2015-04-01": 'Prawo działalności gospodarczej zastępuje ustawę o swobodzie działalności gospodarczej',
+    "2015-10-01": 'nowa interpretacja przepisów podatkowych. Koszt pracy właściciela nie mogą stanowić kosztów uzyskania przychodu',
+    "2016-07-01": 'ośrodki doradztwa roliniczego nie podlegają wojewodom a bezpośrednio ministerstwu rolnictwa',
 }
 
 
@@ -54,7 +54,7 @@ def build_event_timeline(monthly_data, year):
             bordercolor="#c7c7c7",
             borderwidth=1,
             borderpad=3,
-            bgcolor="#ff7f0e",
+            bgcolor="#DED6CC",
             opacity=0.8,
             arrowhead=2,
             arrowsize=1,
