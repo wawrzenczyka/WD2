@@ -77,6 +77,15 @@ app.layout = html.Div(
             className='scroll-container',
             children=[
                 html.Section(
+                  html.Div(
+                    className='screen-height',
+                    children=[
+                        # TUTUAJ WSTAWIC STRONE TYTULOWA
+                        html.Div("TITLE PAGE")
+                    ]
+                  )
+                ),
+                html.Section(
                     id='map-section',
                     children=html.Div(
                         className='screen-height',
