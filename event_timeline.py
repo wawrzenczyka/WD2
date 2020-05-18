@@ -88,12 +88,12 @@ def build_event_timeline(monthly_data, year):
         go.Scatter(
             x=monthly_data['MonthOfTermination'],
             y=monthly_data['Count'],
-            mode='lines',
+            mode='lines+markers',
             name='lines',
             showlegend=False,
             text=list(monthly_data["event_desc"].values),
             hoverinfo='text',
-            marker=dict(color='darkblue'),
+            marker=dict(color='darkblue', size=18, opacity=0),
         )
     )
     fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='#d5d5d5')
