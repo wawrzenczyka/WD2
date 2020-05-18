@@ -108,10 +108,20 @@ def build_event_timeline(monthly_data, year):
             marker=dict(color='darkblue'),
         )
     )
-
+    fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='#d5d5d5')
+    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='#d5d5d5')
     fig.update_layout(
-    xaxis_title="Lata",
-    yaxis_title="Liczba zamkniętych firm",
+        plot_bgcolor='#ffffff',
+        xaxis_title="Lata",
+        yaxis_title="Liczba zamkniętych firm",
+        title={
+                'text': "Liczba zamykanych firm w obrębie miesiąca",
+                'y': 0.99,
+                'x': 0.5,
+                'xanchor': 'center',
+                'yanchor': 'top'
+            },
+        margin=dict(l=100, r=60, t=30, b=0)
     )
 
     return fig

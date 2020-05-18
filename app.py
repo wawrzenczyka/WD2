@@ -81,7 +81,7 @@ app.layout = html.Div([
                             dbc.Col(md=2,
                                     children=html.H3("Rok:", id='year')
                                     ),
-                            dbc.Col(md=8,
+                            dbc.Col(md=7,
                                     children=daq.Slider(
                                         color="default",
                                         id='year-slider',
@@ -95,16 +95,13 @@ app.layout = html.Div([
                                         targets=event_timeline.EVENTS_SLIDER,
                                     ),
                                     ),
-                            dbc.Col(md=2,
+                            dbc.Col(md=3,
                                     children=[
-                                        html.A(
+                                        dbc.Button(
                                             id='start-tour',
                                             href="javascript:customStartIntro();",
-                                            children="Start tour",
-                                            style={
-                                                'text-size': '40pt',
-                                                'padding-bottom': '40px'
-                                            }
+                                            children="Przewodnik po aplikacji",
+                                            color='info'
                                         )
                                     ]
                                     )
@@ -118,29 +115,21 @@ app.layout = html.Div([
                                     className='box',
                                     children=[
                                         dbc.Row(
+                                            id='map-filters',
                                             no_gutters=True,
                                             children=[
-                                                dbc.Col(md=6,
-                                                        id='map-filters',
-                                                        className='fill-height',
-                                                        children=[
-                                                            html.H5('Filter:'),
-                                                            dcc.RadioItems(
-                                                                id='map-type-radiobuttons',
-                                                                options=[
-                                                                    {'label': 'Active companies',
-                                                                     'value': 0},
-                                                                    {'label': '% of terminated companies',
-                                                                     'value': 1}
-                                                                ],
-                                                                value=0,
-                                                                labelStyle={
-                                                                    'display': 'inline-block',
-                                                                    'padding': 5
-                                                                }
-                                                            )
-                                                        ]
-                                                        )
+                                                html.H5('Filtry:'),
+                                                dcc.RadioItems(
+                                                    id='map-type-radiobuttons',
+                                                    labelClassName='map-type-radiobuttons-items',
+                                                    options=[
+                                                        {'label': 'Liczba aktywnych firm',
+                                                         'value': 0},
+                                                        {'label': '% zamkniętych firm',
+                                                         'value': 1}
+                                                    ],
+                                                    value=0
+                                                )
                                             ]
                                         ),
                                         dcc.Graph(
@@ -158,8 +147,12 @@ app.layout = html.Div([
                                     className='box',
                                     children=[
                                         dcc.Graph(
-                                            className='fill-height',
                                             id='timeline',
+                                            className='fill-height',
+                                            config={
+                                                'displayModeBar': False,
+                                                'scrollZoom': False
+                                            },
                                         )
                                     ]
                                     )
@@ -189,8 +182,10 @@ app.layout = html.Div([
                 ]
             )]
     ),
+    html.Hr(),
     html.Div(
         className='screen-height',
+
         children=[html.Div(
             id='prediction',
             style={'text-align': 'center'},
@@ -199,8 +194,11 @@ app.layout = html.Div([
                     style={'width': 'fit-content', 'display': 'inline-block'},
                     id='prediction-input',
                     children=[
-                        html.H1(children='Ile przetrwa twój biznes?',
-                                style={'font-weight': 'bold'}),
+                        html.H1(
+                            id='prediction-header',
+                            children='Ile przetrwa twój biznes?',
+                            style={'font-weight': 'bold'}
+                        ),
 
                         html.Plaintext("Jestem ", style={
                             'display': 'inline-block', 'font-size': '12pt'}),
@@ -311,7 +309,6 @@ app.layout = html.Div([
                 )
             ]
         )]
-
     )
 ])
 
@@ -501,7 +498,7 @@ def plot_proba(sex, PKD_Div_Sec, voivodeship, licence, shareholder, email, phone
                    '72-83', '84-95', '96+'], 'y': proba, 'type': 'bar'},
         ],
         'layout': {
-            'title': 'Prawdopodobieństwo upadku firmy w przedziałach miesięcznych'
+            'title': 'Prawdopodobieństwo upadku firmy w przedziałach miesięcznych',
         }
     }
 
