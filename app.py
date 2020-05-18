@@ -12,6 +12,7 @@ from map_helper import build_map
 import event_timeline
 import os
 from joblib import load
+import visdcc
 
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
@@ -41,10 +42,12 @@ VOIVODESHIPS_MAPPING = [
 # LOAD DATA
 surv_df = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'ceidg_data_formated.csv'), encoding="utf-8")
 surv_removed_df = surv_df[surv_df['Terminated'] == 1]
-surv_removed_df = surv_removed_df.assign(MonthOfTermination=pd.to_datetime(pd.to_datetime(surv_removed_df.DateOfTermination).dt.to_period('M').astype(str), format='%Y-%m'))
+surv_removed_df = surv_removed_df.assign(
+    MonthOfTermination=pd.to_datetime(pd.to_datetime(surv_removed_df.DateOfTermination).dt.to_period('M').astype(str),
+                                      format='%Y-%m'))
 full_daterange = pd.DataFrame({
-        'MonthOfTermination': pd.date_range(start='2011-01-01', end='2020-01-02', freq='MS')
-    })
+    'MonthOfTermination': pd.date_range(start='2011-01-01', end='2020-01-02', freq='MS')
+})
 
 # Global first-page variables
 voivodeship = ''
@@ -62,259 +65,286 @@ app = dash.Dash(__name__, external_stylesheets=[
     './styles.css'
 ], external_scripts=external_scripts)
 
-
 server = app.server
 
 # PREDICTION MODEL
 clf = load('model.joblib')
 
-app.layout = html.Div([
-    html.Div(
-        className='screen-height',
-        children=[
-            html.Div(
-                className='section',
-                children=[
-                    dbc.Row(
-                        className='year-section',
-                        children=[
-                            dbc.Col(md=2,
-                                    children=html.H3("Rok:", id='year')
-                                    ),
-                            dbc.Col(md=7,
-                                    children=daq.Slider(
-                                        color="default",
-                                        id='year-slider',
-                                        min=2011,
-                                        max=2020,
-                                        step=0.5,
-                                        value=2020,
-                                        marks={year + 0.01: str(int(year))
-                                               for year in range(2011, 2021)},
-                                        targets=event_timeline.EVENTS_SLIDER,
-                                    ),
-                                    ),
-                            dbc.Col(md=3,
-                                    children=[
-                                        dbc.Button(
-                                            id='start-tour',
-                                            href="javascript:customStartIntro();",
-                                            children="Przewodnik po aplikacji",
-                                            color='info'
-                                        )
-                                    ]
-                                    )
-                        ]
-                    ),
-                    dbc.Row(
-                        className='top',
-                        no_gutters=True,
-                        children=[
-                            dbc.Col(md=6,
-                                    className='box',
-                                    children=[
-                                        dbc.Row(
-                                            id='map-filters',
-                                            no_gutters=True,
-                                            children=[
-                                                html.H5('Filtry:'),
-                                                dcc.RadioItems(
-                                                    id='map-type-radiobuttons',
-                                                    labelClassName='map-type-radiobuttons-items',
-                                                    options=[
-                                                        {'label': 'Liczba aktywnych firm',
-                                                         'value': 0},
-                                                        {'label': '% zamkniętych firm',
-                                                         'value': 1}
-                                                    ],
-                                                    value=0
-                                                )
-                                            ]
-                                        ),
-                                        dcc.Graph(
-                                            id='map',
-                                            className='fill-height',
-                                            config={
-                                                'displayModeBar': False,
-                                                'scrollZoom': False
-                                            },
-                                        ),
-                                        html.Div(id="output")
-                                    ]
-                                    ),
-                            dbc.Col(md=6,
-                                    className='box',
-                                    children=[
-                                        dcc.Graph(
-                                            id='timeline',
-                                            className='fill-height',
-                                            config={
-                                                'displayModeBar': False,
-                                                'scrollZoom': False
-                                            },
-                                        )
-                                    ]
-                                    )
-                        ]),
-                    dbc.Row(
-                        className='bottom',
-                        no_gutters=True,
-                        children=[
-                            dbc.Col(md=12,
-                                    className='box',
-                                    children=[
-                                        dcc.Graph(
-                                            figure=pkd_fig,
-                                            id='pkd-tree',
-                                            className='fill-height',
-
-                                        ),
-                                    ]
-                                    )
-                        ]),
-                    html.Div(id='selected-voivodeship',
-                             style={'display': 'none'}, children=''),
-                    html.Div(id='selected-pkd-section',
-                             style={'display': 'none'}, children=''),
-                    html.Div(id='selected-voivodeship-indices',
-                             style={'display': 'none'}, children='')
-                ]
-            )]
-    ),
-    html.Hr(),
-    html.Div(
-        className='screen-height',
-
-        children=[html.Div(
-            id='prediction',
-            style={'text-align': 'center'},
+app.layout = html.Div(
+    children=[
+        html.Div(
+            id='main',
+            className='scroll-container',
             children=[
-                html.Div(
-                    style={'width': 'fit-content', 'display': 'inline-block'},
-                    id='prediction-input',
-                    children=[
-                        html.H1(
-                            id='prediction-header',
-                            children='Ile przetrwa twój biznes?',
-                            style={'font-weight': 'bold'}
-                        ),
+                html.Section(
+                    id='map-section',
+                    children=html.Div(
+                        className='screen-height',
+                        children=[
+                            html.Div(
+                                className='section',
+                                children=[
+                                    dbc.Row(
+                                        className='year-section',
+                                        children=[
+                                            dbc.Col(md=2,
+                                                    children=html.H3("Rok:", id='year')
+                                                    ),
+                                            dbc.Col(md=7,
+                                                    children=daq.Slider(
+                                                        color="default",
+                                                        id='year-slider',
+                                                        min=2011,
+                                                        max=2020,
+                                                        step=0.5,
+                                                        value=2020,
+                                                        marks={year + 0.01: str(int(year))
+                                                               for year in range(2011, 2021)},
+                                                        targets=event_timeline.EVENTS_SLIDER,
+                                                    ),
+                                                    ),
+                                            dbc.Col(md=3,
+                                                    children=[
+                                                        dbc.Button(
+                                                            id='start-tour',
+                                                            href="javascript:customStartIntro();",
+                                                            children="Przewodnik po aplikacji",
+                                                            color='info'
+                                                        )
+                                                    ]
+                                                    )
+                                        ]
+                                    ),
+                                    dbc.Row(
+                                        className='top',
+                                        no_gutters=True,
+                                        children=[
+                                            dbc.Col(md=6,
+                                                    className='box',
+                                                    children=[
+                                                        dbc.Row(
+                                                            id='map-filters',
+                                                            no_gutters=True,
+                                                            children=[
+                                                                html.H5('Filtry:'),
+                                                                dcc.RadioItems(
+                                                                    id='map-type-radiobuttons',
+                                                                    labelClassName='map-type-radiobuttons-items',
+                                                                    options=[
+                                                                        {'label': 'Liczba aktywnych firm',
+                                                                         'value': 0},
+                                                                        {'label': '% zamkniętych firm',
+                                                                         'value': 1}
+                                                                    ],
+                                                                    value=0
+                                                                )
+                                                            ]
+                                                        ),
+                                                        dcc.Graph(
+                                                            id='map',
+                                                            className='fill-height',
+                                                            config={
+                                                                'displayModeBar': False,
+                                                                'scrollZoom': False
+                                                            },
+                                                        ),
+                                                        html.Div(id="output")
+                                                    ]
+                                                    ),
+                                            dbc.Col(md=6,
+                                                    className='box',
+                                                    children=[
+                                                        dcc.Graph(
+                                                            id='timeline',
+                                                            className='fill-height',
+                                                            config={
+                                                                'displayModeBar': False,
+                                                                'scrollZoom': False
+                                                            },
+                                                        )
+                                                    ]
+                                                    )
+                                        ]),
+                                    dbc.Row(
+                                        className='bottom',
+                                        no_gutters=True,
+                                        children=[
+                                            dbc.Col(md=12,
+                                                    className='box',
+                                                    children=[
+                                                        dcc.Graph(
+                                                            figure=pkd_fig,
+                                                            id='pkd-tree',
+                                                            className='fill-height',
 
-                        html.Plaintext("Jestem ", style={
-                            'display': 'inline-block', 'font-size': '12pt'}),
-                        dcc.Dropdown(
-                            id='sex',
-                            options=SEX_MAPPING,
-                            value='M',
-                            style=dict(
-                                width=100,
-                                display='inline-block',
-                                verticalAlign="middle",
-                                textAlign="left"
-                            )
-                        ),
-
-                        html.Plaintext(", mam ", style={
-                            'display': 'inline-block', 'font-size': '12pt'}),
-                        dcc.Dropdown(
-                            id='business-type',
-                            options=BUISSNES_MAPPING,
-                            value='Q_86',
-                            style=dict(
-                                width=210,
-                                display='inline-block',
-                                verticalAlign="middle",
-                                textAlign="left"
-                            )
-                        ),
-
-                        html.Plaintext(", jestem z województwa ", style={
-                            'display': 'inline-block', 'font-size': '12pt'}),
-                        dcc.Dropdown(
-                            id='voivodeship',
-                            options=VOIVODESHIPS_MAPPING,
-                            value='mazowieckie',
-                            style=dict(
-                                width=190,
-                                display='inline-block',
-                                verticalAlign="middle",
-                                textAlign="left"
-                            )
-                        ),
-
-                        html.Div([
-                            html.Plaintext(
-                                " i ", style={'display': 'inline-block', 'font-size': '12pt'}),
-
-                            dcc.Dropdown(
-                                id='is_licence',
-                                options=[
-                                    {'label': 'mam licencje', 'value': 1},
-                                    {'label': 'nie mam licencji', 'value': 0},
-                                ],
-                                value=0,
-                                style=dict(
-                                    width=135,
-                                    display='inline-block',
-                                    verticalAlign="middle",
-                                    padding='0',
-                                    textAlign="left"
-                                )
+                                                        ),
+                                                    ]
+                                                    )
+                                        ]),
+                                    html.Div(id='selected-voivodeship',
+                                             style={'display': 'none'}, children=''),
+                                    html.Div(id='selected-pkd-section',
+                                             style={'display': 'none'}, children=''),
+                                    html.Div(id='selected-voivodeship-indices',
+                                             style={'display': 'none'}, children='')
+                                ]
                             ),
-                        ], id='to_hide', style={'display': 'inline-block'},
-
-                        ),
-
-                        html.Plaintext(
-                            ". ", style={'display': 'inline-block', 'font-size': '12pt'}),
-                        dcc.Dropdown(
-                            id='is_shareholder',
-                            options=[
-                                {'label': 'Posiadam udziały', 'value': 1},
-                                {'label': 'Nie posiadam udziałów', 'value': 0},
-                            ],
-                            value=0,
-                            style=dict(
-                                width=185,
-                                display='inline-block',
-                                verticalAlign="middle",
-                                padding='0',
-                                textAlign="left"
-                            )
-                        ),
-                        html.Plaintext(" w innych firmach. ", style={
-                            'display': 'inline-block', 'font-size': '12pt'}),
-
-                        html.Div([
-                            html.Plaintext(
-                                "Mój e-mail to ", style={'display': 'inline-block', 'font-size': '12pt'}),
-                            dcc.Input(id="email", type="text", value="", placeholder="",
-                                      style=dict(display='inline-block')),
-                            html.Plaintext(", mój numer telefonu to ", style={
-                                'display': 'inline-block', 'font-size': '12pt'}),
-                            dcc.Input(id="phone_number", type="text", value="",
-                                      placeholder="", style=dict(display='inline-block')),
-                            html.Plaintext(
-                                ". ", style={'display': 'inline-block', 'font-size': '12pt'}),
-                        ])
-                    ]
+                            html.Hr(),
+                        ]
+                    )
                 ),
-                html.Div(
-                    id='pred-output',
-                    children=[
-                        html.Plaintext("Twoja firma przetrwa", style={
-                            'display': 'block', 'text-align': 'center', 'font-size': '14pt', 'margin-top': '100px',
-                            'margin-bottom': '0px'}),
-                        html.Div(id="prediction-output"),
 
-                        html.Hr(),
+                html.Section(
+                    id='prediction-section',
+                    children=html.Div(
+                        className='screen-height',
+                        children=[html.Div(
+                            id='prediction',
+                            style={'text-align': 'center'},
+                            children=[
+                                html.Div(
+                                    style={'width': 'fit-content', 'display': 'inline-block'},
+                                    id='prediction-input',
+                                    children=[
+                                        html.H1(
+                                            id='prediction-header',
+                                            children='Ile przetrwa twój biznes?',
+                                            style={'font-weight': 'bold'}
+                                        ),
 
-                        dcc.Graph(id='bankrupcy_proba-graph')
-                    ]
+                                        html.Plaintext("Jestem ", style={
+                                            'display': 'inline-block', 'font-size': '12pt'}),
+                                        dcc.Dropdown(
+                                            id='sex',
+                                            options=SEX_MAPPING,
+                                            value='M',
+                                            style=dict(
+                                                width=100,
+                                                display='inline-block',
+                                                verticalAlign="middle",
+                                                textAlign="left"
+                                            )
+                                        ),
+
+                                        html.Plaintext(", mam ", style={
+                                            'display': 'inline-block', 'font-size': '12pt'}),
+                                        dcc.Dropdown(
+                                            id='business-type',
+                                            options=BUISSNES_MAPPING,
+                                            value='Q_86',
+                                            style=dict(
+                                                width=210,
+                                                display='inline-block',
+                                                verticalAlign="middle",
+                                                textAlign="left"
+                                            )
+                                        ),
+
+                                        html.Plaintext(", jestem z województwa ", style={
+                                            'display': 'inline-block', 'font-size': '12pt'}),
+                                        dcc.Dropdown(
+                                            id='voivodeship',
+                                            options=VOIVODESHIPS_MAPPING,
+                                            value='mazowieckie',
+                                            style=dict(
+                                                width=190,
+                                                display='inline-block',
+                                                verticalAlign="middle",
+                                                textAlign="left"
+                                            )
+                                        ),
+
+                                        html.Div([
+                                            html.Plaintext(
+                                                " i ", style={'display': 'inline-block', 'font-size': '12pt'}),
+
+                                            dcc.Dropdown(
+                                                id='is_licence',
+                                                options=[
+                                                    {'label': 'mam licencje', 'value': 1},
+                                                    {'label': 'nie mam licencji', 'value': 0},
+                                                ],
+                                                value=0,
+                                                style=dict(
+                                                    width=135,
+                                                    display='inline-block',
+                                                    verticalAlign="middle",
+                                                    padding='0',
+                                                    textAlign="left"
+                                                )
+                                            ),
+                                        ], id='to_hide', style={'display': 'inline-block'},
+
+                                        ),
+
+                                        html.Plaintext(
+                                            ". ", style={'display': 'inline-block', 'font-size': '12pt'}),
+                                        dcc.Dropdown(
+                                            id='is_shareholder',
+                                            options=[
+                                                {'label': 'Posiadam udziały', 'value': 1},
+                                                {'label': 'Nie posiadam udziałów', 'value': 0},
+                                            ],
+                                            value=0,
+                                            style=dict(
+                                                width=185,
+                                                display='inline-block',
+                                                verticalAlign="middle",
+                                                padding='0',
+                                                textAlign="left"
+                                            )
+                                        ),
+                                        html.Plaintext(" w innych firmach. ", style={
+                                            'display': 'inline-block', 'font-size': '12pt'}),
+
+                                        html.Div([
+                                            html.Plaintext(
+                                                "Mój e-mail to ",
+                                                style={'display': 'inline-block', 'font-size': '12pt'}),
+                                            dcc.Input(id="email", type="text", value="", placeholder="",
+                                                      style=dict(display='inline-block')),
+                                            html.Plaintext(", mój numer telefonu to ", style={
+                                                'display': 'inline-block', 'font-size': '12pt'}),
+                                            dcc.Input(id="phone_number", type="text", value="",
+                                                      placeholder="", style=dict(display='inline-block')),
+                                            html.Plaintext(
+                                                ". ", style={'display': 'inline-block', 'font-size': '12pt'}),
+                                        ])
+                                    ]
+                                ),
+                                html.Div(
+                                    id='pred-output',
+                                    children=[
+                                        html.Plaintext("Twoja firma przetrwa", style={
+                                            'display': 'block', 'text-align': 'center', 'font-size': '14pt',
+                                            'margin-top': '100px',
+                                            'margin-bottom': '0px'}),
+                                        html.Div(id="prediction-output"),
+
+                                        html.Hr(),
+
+                                        dcc.Graph(id='bankrupcy_proba-graph')
+                                    ]
+                                )
+                            ]
+                        )]
+                    )
                 )
-            ]
-        )]
-    )
-])
+            ]),
+        visdcc.Run_js(id = 'javascript',
+                      run = '''
+                            new fullScroll({	
+                                mainElement: 'main', 
+                                sections:['map-section','prediction-section'],
+                                displayDots: true,
+                                dotsPosition: 'right',
+                                animateTime: 0.7
+                                ,animateFunction: 'ease'	
+                            });
+                            '''
+                      ),
+    ]
+)
 
 
 @app.callback(
@@ -390,6 +420,7 @@ def select_pkd_section(click, mapClick, old):
 
     return [selected_section]
 
+
 @app.callback(
     [
         Output('pkd-tree', 'figure'),
@@ -400,6 +431,7 @@ def select_pkd_section(click, mapClick, old):
 def redraw_treemap(voivodeship):
     voivodeship = [voiv.lower() for voiv in voivodeship]
     return [build_pkd_treemap(voivodeship=voivodeship)]
+
 
 @app.callback(
     [
@@ -424,8 +456,8 @@ def redraw_timeline(year, voivodeship, pkd_section):
             # division (eg. 47)
             data = data[data['PKDMainDivision'] == float(pkd_section)]
 
-    monthly_data = data[["MonthOfTermination", "Count"]]\
-        .groupby(["MonthOfTermination"])\
+    monthly_data = data[["MonthOfTermination", "Count"]] \
+        .groupby(["MonthOfTermination"]) \
         .sum().reset_index()
 
     monthly_data_filled = full_daterange.merge(
