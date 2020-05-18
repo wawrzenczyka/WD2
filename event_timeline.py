@@ -6,26 +6,22 @@ import dash_bootstrap_components as dbc
 import numpy as np
 import datetime
 
+# wanted style {"color": 'darkblue', "font-size": 10, "line-height": 10, "font-weight": 200}
+
 EVENTS_SLIDER = {
-    2013: {"label": 'Nowe podatki', 'style': {"color": "#CD5C5C"}},
-    2014: {"label": 'Upadki skoków', 'style': {"color": "#FF9933"}},
-    2016: {"label": 'Zaostrzenie przepisów', 'style': {"color": "#99FF33"}},
-    2016.5: {"label": 'Nowe podatki', 'style': {"color": "#7F00FF"}},
-    2017: {"label": 'Kontrole rolników', 'style': {"color": "#00BFFF"}},
+    2013: {"label": 'Nowe podatki', "date": "2013-01-01" ,'style': {"color": 'darkblue'}},
+    2014: {"label": 'Upadki skoków', "date": "2014-05-01" , 'style': {"color": 'darkblue'}},
+    2016: {"label": 'Zaostrzenie przepisów', "date": "2015-11-01" , 'style': {"color": 'darkblue'}},
+    2016.5: {"label": 'Nowe podatki', "date": "2016-06-01" , 'style': {"color": 'darkblue'}},
+    2017: {"label": 'Kontrole rolników', "date": "2017-01-01" , 'style': {"color": 'darkblue'}},
 }
 
 EVENTS_DESCRIPTION = {
-    2011: '',
-    2012: '',
-    2013: 'nowe wartości stóp procentowych',
-    2014: 'upadki instytucji finansowych spółdzielczej kasy oszczędnościowo-kredytowej',
-    2015: '',
-    2016: 'Prawo działalności gospodarczej zastępuje ustawę o swobodzie działalności gospodarczej, <br>'
-          'nowa interpretacja przepisów podatkowych. Koszt pracy wlasciciela nie mogą stanowić kosztów uzyskania przychodu',
-    2017: 'ośrodki doradztwa roliniczego nie podlegają wojewodom a bezpośrednio ministerstwu rolnictwa',
-    2018: '',
-    2019: '',
-    2020: '',
+    "2013-01-01": 'nowe wartości stóp procentowych',
+    "2014-05-01": 'upadki instytucji finansowych spółdzielczej kasy oszczędnościowo-kredytowej',
+    "2015-11-01": 'Prawo działalności gospodarczej zastępuje ustawę o swobodzie działalności gospodarczej,',
+    "2016-06-01": 'nowa interpretacja przepisów podatkowych. Koszt pracy wlasciciela nie mogą stanowić kosztów uzyskania przychodu',
+    "2017-01-01": 'ośrodki doradztwa roliniczego nie podlegają wojewodom a bezpośrednio ministerstwu rolnictwa',
 }
 
 
@@ -33,15 +29,9 @@ def build_event_timeline(monthly_data, year):
     fig = go.Figure()
 
     if year in EVENTS_SLIDER:
-        if year > int(year):
-            years = [year - 0.5, year + 0.5]
-            x_label = datetime.datetime.strptime(str(int(year)) + '-06', '%Y-%m')
-        else:
-            years = [year]
-            x_label = datetime.datetime.strptime(str(int(year)) + '-01', '%Y-%m')
+        x_label = EVENTS_SLIDER[year]['date']
+        y = monthly_data[monthly_data['MonthOfTermination'] == x_label]['Count'].iloc[0]
 
-        y = monthly_data[monthly_data['MonthOfTermination'] == x_label]['Count'].mean()
-        
         fig.add_trace(
             go.Scatter(
                 x=[x_label],
@@ -49,7 +39,7 @@ def build_event_timeline(monthly_data, year):
                 mode='markers',
                 name='markers',
                 showlegend=False,
-                marker=dict(size=18, opacity=1, color=EVENTS_SLIDER[np.mean(years)]['style']['color']),
+                marker=dict(size=18, opacity=1, color=EVENTS_SLIDER[year]['style']['color']),
                 hoverinfo='none',
             )
         )
@@ -73,15 +63,9 @@ def build_event_timeline(monthly_data, year):
             align="center",
         )
 
-    for year in EVENTS_SLIDER.keys():
-        if year > int(year):
-            years = [year - 0.5, year + 0.5]
-            x_label = datetime.datetime.strptime(str(int(np.mean(year))) + '-06', '%Y-%m')
-        else:
-            years = [year]
-            x_label = datetime.datetime.strptime(str(int(np.mean(year))) + '-01', '%Y-%m')
-
-        y = monthly_data[monthly_data['MonthOfTermination'] == x_label]['Count'].mean()
+    for event_year in EVENTS_SLIDER.keys():
+        x_label = EVENTS_SLIDER[event_year]['date']
+        y = monthly_data[monthly_data['MonthOfTermination'] == x_label]['Count'].iloc[0]
 
         fig.add_trace(
             go.Scatter(
@@ -90,11 +74,15 @@ def build_event_timeline(monthly_data, year):
                 mode='markers',
                 name='markers',
                 showlegend=False,
-                marker=dict(size=18, opacity=0.25, color=EVENTS_SLIDER[year]['style']['color']),
+                marker=dict(size=18, opacity=0.35, color=EVENTS_SLIDER[event_year]['style']['color']),
                 hoverinfo='none',
                 #marker_symbol="star",
             )
         )
+
+    monthly_data["event_desc"] = ""
+    for date, event_desc in EVENTS_DESCRIPTION.items():
+        monthly_data.loc[monthly_data["MonthOfTermination"] == date, "event_desc"] = event_desc
 
     fig.add_trace(
         go.Scatter(
@@ -103,7 +91,7 @@ def build_event_timeline(monthly_data, year):
             mode='lines',
             name='lines',
             showlegend=False,
-            text=list(EVENTS_DESCRIPTION.values()),
+            text=list(monthly_data["event_desc"].values),
             hoverinfo='text',
             marker=dict(color='darkblue'),
         )
