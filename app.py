@@ -40,7 +40,8 @@ VOIVODESHIPS_MAPPING = [
 ]
 
 # LOAD DATA
-surv_df = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'ceidg_data_formated.csv'), encoding="utf-8")
+surv_df = pd.read_csv(os.path.join(THIS_FOLDER, 'data',
+                                   'ceidg_data_formated.csv'), encoding="utf-8")
 surv_removed_df = surv_df[surv_df['Terminated'] == 1]
 surv_removed_df = surv_removed_df.assign(
     MonthOfTermination=pd.to_datetime(pd.to_datetime(surv_removed_df.DateOfTermination).dt.to_period('M').astype(str),
@@ -77,13 +78,15 @@ app.layout = html.Div(
             className='scroll-container',
             children=[
                 html.Section(
-                  html.Div(
-                    className='screen-height',
-                    children=[
-                        # TUTUAJ WSTAWIC STRONE TYTULOWA
-                        html.Div("TITLE PAGE")
-                    ]
-                  )
+                    id='title-section',
+                    style={'opacity': 0},
+                    children=html.Div(
+                      className='screen-height',
+                        children=[
+                            # TUTUAJ WSTAWIC STRONE TYTULOWA
+                            html.Div("TITLE PAGE")
+                        ]
+                    )
                 ),
                 html.Section(
                     id='map-section',
@@ -97,7 +100,8 @@ app.layout = html.Div(
                                         className='year-section',
                                         children=[
                                             dbc.Col(md=2,
-                                                    children=html.H3("Rok:", id='year')
+                                                    children=html.H3(
+                                                        "Rok:", id='year')
                                                     ),
                                             dbc.Col(md=7,
                                                     children=daq.Slider(
@@ -135,7 +139,8 @@ app.layout = html.Div(
                                                             id='map-filters',
                                                             no_gutters=True,
                                                             children=[
-                                                                html.H5('Filtry:'),
+                                                                html.H5(
+                                                                    'Filtry:'),
                                                                 dcc.RadioItems(
                                                                     id='map-type-radiobuttons',
                                                                     labelClassName='map-type-radiobuttons-items',
@@ -195,14 +200,14 @@ app.layout = html.Div(
                                     html.Div(id='selected-pkd-section',
                                              style={'display': 'none'}, children=''),
                                     html.Div(id='selected-voivodeship-indices',
-                                             style={'display': 'none'}, children='')
+                                             style={'display': 'none'}, children=''),
+                                    html.Div(id='scroll-blocker', className='scroll')
                                 ]
                             ),
                             html.Hr(),
                         ]
                     )
                 ),
-
                 html.Section(
                     id='prediction-section',
                     children=html.Div(
@@ -212,7 +217,8 @@ app.layout = html.Div(
                             style={'text-align': 'center'},
                             children=[
                                 html.Div(
-                                    style={'width': 'fit-content', 'display': 'inline-block'},
+                                    style={'width': 'fit-content',
+                                           'display': 'inline-block'},
                                     id='prediction-input',
                                     children=[
                                         html.H1(
@@ -270,8 +276,10 @@ app.layout = html.Div(
                                             dcc.Dropdown(
                                                 id='is_licence',
                                                 options=[
-                                                    {'label': 'mam licencje', 'value': 1},
-                                                    {'label': 'nie mam licencji', 'value': 0},
+                                                    {'label': 'mam licencje',
+                                                        'value': 1},
+                                                    {'label': 'nie mam licencji',
+                                                        'value': 0},
                                                 ],
                                                 value=0,
                                                 style=dict(
@@ -291,8 +299,10 @@ app.layout = html.Div(
                                         dcc.Dropdown(
                                             id='is_shareholder',
                                             options=[
-                                                {'label': 'Posiadam udziały', 'value': 1},
-                                                {'label': 'Nie posiadam udziałów', 'value': 0},
+                                                {'label': 'Posiadam udziały',
+                                                    'value': 1},
+                                                {'label': 'Nie posiadam udziałów',
+                                                    'value': 0},
                                             ],
                                             value=0,
                                             style=dict(
@@ -340,15 +350,15 @@ app.layout = html.Div(
                     )
                 )
             ]),
-        visdcc.Run_js(id = 'javascript',
-                      run = '''
+        visdcc.Run_js(id='javascript',
+                      run='''
                             new fullScroll({	
                                 mainElement: 'main', 
-                                sections:['map-section','prediction-section'],
+                                sections:['title-section', 'map-section','prediction-section'],
                                 displayDots: true,
                                 dotsPosition: 'right',
-                                animateTime: 0.7
-                                ,animateFunction: 'ease'	
+                                animateTime: 0.7,
+                                animateFunction: 'ease'	
                             });
                             '''
                       ),

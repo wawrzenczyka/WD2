@@ -3,7 +3,7 @@
  */
 (function () {
 	'use strict';
-	
+
 	/**
 	 * Full scroll main function
 	 */
@@ -13,22 +13,22 @@
 		 * @type {Object}
 		 */
 		var main = document.getElementById(params.mainElement);
-		
+
 		/**
 		 * Sections divclass
 		 * @type {Array}
 		 */
 		var sections = main.getElementsByTagName('section');
-		
+
 		/**
 		 * Full page scroll configurations
 		 * @type {Object}
 		 */
 		var dfs = {
-			container : main,
-			sections : sections,
-			animateTime : params.animateTime || 0.7,
-			animateFunction : params.animateFunction || 'ease',
+			container: main,
+			sections: sections,
+			animateTime: params.animateTime || 0.7,
+			animateFunction: params.animateFunction || 'ease',
 			maxPosition: sections.length - 1,
 			currentPosition: 0,
 			displayDots: typeof params.displayDots != 'undefined' ? params.displayDots : true,
@@ -73,20 +73,20 @@
 	 * Build dots navigation
 	 * @return {Object} this (fullScroll)
 	 */
-	fullScroll.prototype.buildDots = function () {		
+	fullScroll.prototype.buildDots = function () {
 		this.ul = document.createElement('ul');
-		
+
 		this.ul.className = this.updateClass(1, 'dots', this.ul.className);
 		this.ul.className = this.updateClass(1, this.defaults.dotsPosition == 'right' ? 'dots-right' : 'dots-left', this.ul.className);
 
 		var _self = this;
-		var sections = this.defaults.sections;		
+		var sections = this.defaults.sections;
 
 		for (var i = 0; i < sections.length; i++) {
 			var li = document.createElement('li');
 			var a = document.createElement('a');
-		
-			a.setAttribute('href', '#' + i);			
+
+			a.setAttribute('href', '#' + i);
 			li.appendChild(a);
 			_self.ul.appendChild(li);
 		}
@@ -105,7 +105,7 @@
 	 * @return {Object} this(fullScroll)
 	 */
 	fullScroll.prototype.addEvents = function () {
-		
+
 		if (document.addEventListener) {
 			document.addEventListener('mousewheel', this.mouseWheelAndKey, false);
 			document.addEventListener('wheel', this.mouseWheelAndKey, false);
@@ -117,20 +117,20 @@
 			/**
 			 * Enable scroll if decive don't have touch support
 			 */
-			if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-				if(!('ontouchstart' in window)){
+			if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+				if (!('ontouchstart' in window)) {
 					document.body.style = "overflow: scroll;";
 					document.documentElement.style = "overflow: scroll;";
 				}
-			}			
+			}
 
 		} else {
 			document.attachEvent('onmousewheel', this.mouseWheelAndKey, false);
 			document.attachEvent('onkeyup', this.mouseWheelAndKey, false);
 		}
-		
+
 		return this;
-	};	
+	};
 
 	/**
 	 * Build public functions
@@ -142,12 +142,15 @@
 		var _self = this;
 
 		this.mouseWheelAndKey = function (event) {
-			if (event.deltaY > 0 || event.keyCode == 40) {	
-				_self.defaults.currentPosition ++;
-				_self.changeCurrentPosition(_self.defaults.currentPosition);				
-			} else if (event.deltaY < 0 || event.keyCode == 38) {
-				_self.defaults.currentPosition --;
-				_self.changeCurrentPosition(_self.defaults.currentPosition);	
+			var scroll_blocker = document.getElementById('scroll-blocker').className;
+			if (scroll_blocker == 'scroll') {
+				if (event.deltaY > 0 || event.keyCode == 40) {
+					_self.defaults.currentPosition++;
+					_self.changeCurrentPosition(_self.defaults.currentPosition);
+				} else if (event.deltaY < 0 || event.keyCode == 38) {
+					_self.defaults.currentPosition--;
+					_self.changeCurrentPosition(_self.defaults.currentPosition);
+				}
 			}
 			_self.removeEvents();
 		};
@@ -161,12 +164,12 @@
 			mTouchEnd = parseInt(event.changedTouches[0].clientY);
 			if (mTouchEnd - mTouchStart > 100 || mTouchStart - mTouchEnd > 100) {
 				if (mTouchEnd > mTouchStart) {
-					_self.defaults.currentPosition --;
+					_self.defaults.currentPosition--;
 				} else {
-					_self.defaults.currentPosition ++;					
+					_self.defaults.currentPosition++;
 				}
 				_self.changeCurrentPosition(_self.defaults.currentPosition);
-			}			
+			}
 		};
 
 		this.hashChange = function (event) {
@@ -180,25 +183,25 @@
 					} else {
 						_self.defaults.currentPosition = anchor;
 						_self.animateScroll();
-					}					
-				}				
+					}
+				}
 			}
 		};
 
 		this.removeEvents = function () {
 			if (document.addEventListener) {
-			document.removeEventListener('mousewheel', this.mouseWheelAndKey, false);
-			document.removeEventListener('wheel', this.mouseWheelAndKey, false);
-			document.removeEventListener('keyup', this.mouseWheelAndKey, false);
-			document.removeEventListener('touchstart', this.touchStart, false);
-			document.removeEventListener('touchend', this.touchEnd, false);
+				document.removeEventListener('mousewheel', this.mouseWheelAndKey, false);
+				document.removeEventListener('wheel', this.mouseWheelAndKey, false);
+				document.removeEventListener('keyup', this.mouseWheelAndKey, false);
+				document.removeEventListener('touchstart', this.touchStart, false);
+				document.removeEventListener('touchend', this.touchEnd, false);
 
 			} else {
 				document.detachEvent('onmousewheel', this.mouseWheelAndKey, false);
 				document.detachEvent('onkeyup', this.mouseWheelAndKey, false);
 			}
 
-			setTimeout(function(){
+			setTimeout(function () {
 				_self.addEvents();
 			}, 600);
 		};
@@ -218,8 +221,8 @@
 			this.defaults.container.style.transition = 'all ' + animateTime + 's ' + animateFunction;
 
 			for (var i = 0; i < this.ul.childNodes.length; i++) {
-					this.ul.childNodes[i].firstChild.className = this.updateClass(2, 'active', this.ul.childNodes[i].firstChild.className);
-					if (i == this.defaults.currentPosition) {
+				this.ul.childNodes[i].firstChild.className = this.updateClass(2, 'active', this.ul.childNodes[i].firstChild.className);
+				if (i == this.defaults.currentPosition) {
 					this.ul.childNodes[i].firstChild.className = this.updateClass(1, 'active', this.ul.childNodes[i].firstChild.className);
 				}
 			}
@@ -233,7 +236,7 @@
 		};
 
 		this.registerIeTags = function () {
-			document.createElement('section'); 
+			document.createElement('section');
 		};
 
 		this.updateClass = function (type, newClass, currentClass) {

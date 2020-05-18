@@ -1,4 +1,5 @@
 function customStartIntro(){
+    $('#scroll-blocker').addClass('stop-scrolling')
     var intro = introJs();
       intro.setOption('tooltipClass', 'customDefault') //custom buttons and general layout of tooltip
       intro.setOptions({
@@ -161,13 +162,19 @@ function customStartIntro(){
       });
       intro.onbeforechange(function(targetElement) {
         switch (targetElement.id){
+          case "year-slider":
+            $('#main').attr('style','transform: translateY(-33%) !important; transition: all 0.7s ease 0s important!;');
+            break;
           case "pkd-tree":
+            $('#main').attr('style','transform: translateY(-33%) !important; transition: all 0.7s ease 0s important!;');
             $('.introjs-arrow').attr('style','opacity: 0 !important;');
             break;
           case "prediction-input":
+            $('#main').attr('style','transform: translateY(-66%) !important; transition: all 0.7s ease 0s important!;');
             $('.introjs-arrow').attr('style','opacity: 0 !important;');
             break;
           case "pred-output":
+            $('#main').attr('style','transform: translateY(-66%) !important; transition: all 0.7s ease 0s important!;');
             $('.introjs-arrow').attr('style','opacity: 0 !important;');
             break;
           default:
