@@ -52,7 +52,7 @@ pkd_section = ''
 
 map_type_options = ['Active companies', '% of terminated companies']
 external_scripts = [
-    'http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js'
+    'https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js'
 ]
 # Treemap init
 pkd_fig = build_pkd_treemap()
