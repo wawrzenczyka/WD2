@@ -89,7 +89,6 @@ app.layout = html.Div([
                                         max=2020,
                                         step=0.5,
                                         value=2020,
-                                        size=1000,
                                         marks={year + 0.01: str(int(year))
                                                for year in range(2011, 2021)},
                                         targets=event_timeline.EVENTS_SLIDER,
