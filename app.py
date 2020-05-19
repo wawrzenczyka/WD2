@@ -4,7 +4,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 import dash_daq as daq
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output, State, ClientsideFunction
 import pandas as pd
 import numpy as np
 from treemap_helper import build_pkd_treemap
@@ -139,6 +139,7 @@ app.layout = html.Div([
                                                 'scrollZoom': False
                                             },
                                         ),
+                                        html.Plaintext(id="zoom", style=dict(visibility="collapse")),
                                         html.Div(id="output")
                                     ]
                                     ),
@@ -323,9 +324,10 @@ app.layout = html.Div([
         Input('year-slider', 'value'),
         Input('map-type-radiobuttons', 'value'),
         Input('selected-voivodeship-indices', 'children'),
+        Input('zoom', 'children')
     ])
-def update_map(year, map_type, selceted_voivodeships):
-    return build_map(int(year), map_type, selceted_voivodeships)
+def update_map(year, map_type, selceted_voivodeships, zoom):
+    return build_map(int(year), map_type, selceted_voivodeships, zoom)
 
 
 @app.callback(
@@ -505,6 +507,20 @@ def plot_proba(sex, PKD_Div_Sec, voivodeship, licence, shareholder, email, phone
             'title': 'Prawdopodobieństwo upadku firmy w przedziałach miesięcznych',
         }
     }
+
+
+app.clientside_callback(
+    """
+        function(args) {
+            zoom_x = document.documentElement.clientWidth / 1920.0 * 1.5
+            zoom_y = document.documentElement.clientHeight / 966.0
+            val = Math.min(zoom_x, zoom_y)
+            return val * 5
+        }
+    """,
+    Output('zoom', 'children'),
+    [Input('year-slider', 'value')]
+)
 
 
 if __name__ == '__main__':
