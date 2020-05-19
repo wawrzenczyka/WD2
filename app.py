@@ -100,7 +100,7 @@ app.layout = html.Div([
                                             id='start-tour',
                                             href="javascript:customStartIntro();",
                                             children="Przewodnik po aplikacji",
-                                            color='info'
+                                            color='primary'
                                         )
                                     ]
                                     )

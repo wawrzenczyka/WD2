@@ -82,8 +82,9 @@ function customStartIntro(){
           {
             element: '#timeline',
             intro: "<b>Wykres umieralności firm</b> \
-              <p>Wykres przedstawia liczbę firm, które upadły w danym miesiącu. <hr>\
-              Dane można filtrować wybierając interesujące nas województwa i/lub sekcję PKD.</p>",
+              <p>Wykres przedstawia liczbę firm, które upadły w danym miesiącu.</p> <hr>\
+              <p>Dane można filtrować wybierając interesujące nas województwa i/lub sekcję PKD.</p><hr> \
+              Po <b>najechaniu</b> na któryś z zaznaczonych punktów pojawia się szczegółowy opis tego zdarzenia.",
             position: 'left',
             scrollTo: 'pkd-tree'
           },
