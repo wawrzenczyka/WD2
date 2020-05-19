@@ -37,7 +37,6 @@ VOIVODESHIPS_MAPPING = [
     {'label': 'Wielkopolskiego', 'value': 'wielkopolskie'},
     {'label': 'Warmińsko-Mazurskiego', 'value': 'warminsko-mazurskie'},
     {'label': 'Zachodniopomorskiego', 'value': 'zachodniopomorskie'},
-    {'label': '', 'value': 'na'},
 ]
 
 # LOAD DATA
@@ -249,7 +248,6 @@ app.layout = html.Div(
                                     html.Div(id='scroll-blocker', className='scroll')
                                 ]
                             ),
-                            html.Hr(),
                         ]
                     )
                 ),
@@ -269,7 +267,7 @@ app.layout = html.Div(
                                         html.H1(
                                             id='prediction-header',
                                             children='Ile przetrwa twój biznes?',
-                                            style={'font-weight': 'bold'}
+                                            style={'font-weight': 'bold', 'padding': '18px'}
                                         ),
 
                                         html.Plaintext("Jestem ", style={
@@ -293,7 +291,7 @@ app.layout = html.Div(
                                             options=BUISSNES_MAPPING,
                                             value='Q_86',
                                             style=dict(
-                                                width=210,
+                                                width=230,
                                                 display='inline-block',
                                                 verticalAlign="middle",
                                                 textAlign="left"
@@ -307,7 +305,7 @@ app.layout = html.Div(
                                             options=VOIVODESHIPS_MAPPING,
                                             value='mazowieckie',
                                             style=dict(
-                                                width=190,
+                                                width=195,
                                                 display='inline-block',
                                                 verticalAlign="middle",
                                                 textAlign="left"
@@ -328,7 +326,7 @@ app.layout = html.Div(
                                                 ],
                                                 value=0,
                                                 style=dict(
-                                                    width=135,
+                                                    width=150,
                                                     display='inline-block',
                                                     verticalAlign="middle",
                                                     padding='0',
@@ -351,7 +349,7 @@ app.layout = html.Div(
                                             ],
                                             value=0,
                                             style=dict(
-                                                width=185,
+                                                width=195,
                                                 display='inline-block',
                                                 verticalAlign="middle",
                                                 padding='0',
@@ -379,16 +377,18 @@ app.layout = html.Div(
                                 html.Div(
                                     id='pred-output',
                                     children=[
-                                        html.Plaintext("Twoja firma przetrwa", style={
-                                            'display': 'block', 'text-align': 'center', 'font-size': '14pt',
-                                            'margin-top': '100px',
-                                            'margin-bottom': '0px'}),
-                                        html.Div(id="prediction-output"),
-
-                                        html.Hr(),
-
-                                        dcc.Graph(id='bankrupcy_proba-graph')
-                                    ]
+                                        html.Div([
+                                            html.Plaintext("Twoja firma przetrwa", style={
+                                                'display': 'block', 'text-align': 'center', 'font-size': '14pt'
+                                            }),
+                                            html.Div("", style = {'width': '50px'}),
+                                            html.Div(id="prediction-output"),
+                                        ], style = {'width': '400px'}),
+                                        html.Div([
+                                            dcc.Graph(id='bankrupcy_proba-graph')
+                                        ], style = {'flex': 1})
+                                    ],
+                                    style = {'align-items': 'center', 'display': 'flex', 'flex-direction': 'row', 'justify-content': 'center', 'margin-top': '50px'}
                                 )
                             ]
                         )]
