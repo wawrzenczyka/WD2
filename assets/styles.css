@@ -86,3 +86,36 @@
   background-color: #5f6690 !important;
   border-color: #00008b !important;
 }
+
+
+#pred-output{
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#prediction-value-text{
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+
+#prediction-graph-div{
+    flex: 0;
+    width: 95%;
+}
+
+@media only screen and (max-height: 900px) {
+  #pred-output{
+    flex-direction: row;
+  }
+
+  #prediction-graph-div{
+    flex: 1;
+    }
+
+  #prediction-value-text{
+    margin-top: 0px;
+    margin-bottom: 0px;
+    }
+}
