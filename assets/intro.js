@@ -507,6 +507,7 @@
    * @param {Boolean} force - Setting to `true` will skip the result of beforeExit callback
    */
   function _exitIntro(targetElement, force) {
+    document.getElementById('scroll-blocker').className = "scroll"
     var continueExit = true;
 
     // calling onbeforeexit callback
