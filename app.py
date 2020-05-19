@@ -114,7 +114,7 @@ app.layout = html.Div(
                                     html.Div("W jakim regionie firmy przetrwały najdłużej?", style = {'font-size': 18}),
                                     html.Div("Które rodzaje działalności mają nawiększe szanse na sukces?", style = {'font-size': 18}),
                                     html.Div("Kiedy najczęściej upadają firmy?", style = {'font-size': 18}),
-                                    dcc.Link("Sprawdź", href = '#1', style = {'font-size': 18}),
+                                    dcc.Link("Sprawdź", href = '#1', style = {'font-size': 18}, id = 'analysis-button'),
                                 ], style = {'align-items': 'center', 'display': 'flex', 'flex-direction': 'column', 'justify-content': 'center'}),
                                 html.Div("", style = {'width': '100px'}),
                                 html.Div([
@@ -124,7 +124,7 @@ app.layout = html.Div(
                                         height=250)
                                     ]),
                                     html.Div("Jakie są Twoje szanse na sukces?", style = {'font-size': 18}),
-                                    dcc.Link("Sprawdź", href = '#2', style = {'font-size': 18}),                                    
+                                    dcc.Link("Sprawdź", href = '#2', style = {'font-size': 18}, id = 'prediction-button'),                                    
                                 ], style = {'align-items': 'center', 'display': 'flex', 'flex-direction': 'column', 'justify-content': 'center', 'align-self': 'flex-start'}),
                             ], style = {'align-items': 'center', 'display': 'flex', 'flex-direction': 'row', 'justify-content': 'center', 
                                         'padding-top': '50px'}),
