@@ -1,31 +1,31 @@
-function customStartIntro(){
-    $('#scroll-blocker').addClass('stop-scrolling')
-    var intro = introJs();
-      intro.setOption('tooltipClass', 'customDefault') //custom buttons and general layout of tooltip
-      intro.setOptions({
-        steps: [
-          {
-            element: '#year-slider',
-            intro: "<b>Oś czasu</b><hr> \
+async function customStartIntro() {
+  $('#scroll-blocker').addClass('stop-scrolling')
+  var intro = introJs();
+  intro.setOption('tooltipClass', 'customDefault') //custom buttons and general layout of tooltip
+  intro.setOptions({
+    steps: [
+      {
+        element: '#year-slider',
+        intro: "<b>Oś czasu</b><hr> \
               <img width='54px' height='50px' src='assets/Images/map_image.PNG' style='float: right;'> \
               <p style='text-align: left;'>Zmieniając położenie slidera można obejrzeć stan interaktywnej mapy Polski w wybranym roku.</p><hr> \
               <img src='assets/Images/plate_image.PNG' style='float: right;'> \
               <p style='text-align: left;'>Kliknięcie kolorowej tabliczki spowoduje podświetlenie korespondującego zdarzenia na poniższym wykresie.</p>",
-            position: 'right'
-          },
-          {
-            element: '#map-filters',
-            intro: "<b>Filtr danych</b><hr> \
+        position: 'right'
+      },
+      {
+        element: '#map-filters',
+        intro: "<b>Filtr danych</b><hr> \
               <div><input type='checkbox' id='ac' value disabled><label for='ac'>Liczba aktywnych firm</label></div> \
               Wyświetla na poniższej mapie informację o liczbie \
               aktywnych działalności gospodarczych w danym województwie.<hr> \
               <div><input type='checkbox' id='percent' value disabled><label for='percent'>% zamkniętych firm</label></div> \
               Wyświetla odsetek działalności upadłych w danym województwie, do roku zaznaczonego na osi czasu.",
-            position: 'right'
-          },
-          {
-            element: '#map',
-            intro: '<style> \
+        position: 'right'
+      },
+      {
+        element: '#map',
+        intro: '<style> \
               body {font-family: Arial;}\
               .tab { \
                 overflow: hidden;\
@@ -78,19 +78,19 @@ function customStartIntro(){
                 oraz przeciętnego czasu życia ze względu na sekcję PKD (poniżej), zaktualizują się i będą dotyczyć \
                 tylko wybranych województw. Brak zaznaczenia jest równoważny zaznaczeniu wszystkich województw, czyli całej Polski.</p> \
               </div>',
-            position: 'right'
-          },
-          {
-            element: '#timeline',
-            intro: "<b>Wykres umieralności firm</b> \
+        position: 'right'
+      },
+      {
+        element: '#timeline',
+        intro: "<b>Wykres umieralności firm</b> \
               <p>Wykres przedstawia liczbę firm, które upadły w danym miesiącu. <hr>\
               Dane można filtrować wybierając interesujące nas województwa i/lub sekcję PKD.</p>",
-            position: 'left',
-            scrollTo: 'pkd-tree'
-          },
-          {
-            element: '#pkd-tree',
-            intro: '<style> \
+        position: 'left',
+        scrollTo: 'pkd-tree'
+      },
+      {
+        element: '#pkd-tree',
+        intro: '<style> \
             body {font-family: Arial;}\
             .tab { \
               overflow: hidden;\
@@ -143,47 +143,53 @@ function customStartIntro(){
               dotyczące wybranej sekcji/dywizji.</p><hr> \
               <p>Brak zaznaczenia jest równoważny zaznaczeniu wszystkich sekcji i dywizji jednocześnie.</p>\
             </div>',
-            position: 'top'
-          },
-          {
-            element: '#prediction-input',
-            intro: '<b>Predykcja - wprowadzanie danych</b><br> \
+        position: 'top'
+      },
+      {
+        element: '#prediction-input',
+        intro: '<b>Predykcja - wprowadzanie danych</b><br> \
               Wypełnij pola by sprawdzić ile przetrwa Twój biznes!',
-            position: 'bottom'
-          },
-          {
-            element: '#pred-output',
-            intro: '<b>Predykcja - wyniki</b><br> \
+        position: 'bottom'
+      },
+      {
+        element: '#pred-output',
+        intro: '<b>Predykcja - wyniki</b><br> \
               <p>Prognozy co do przetrwania Twojej firmy znajdują się poniżej.</p><hr> \
               <p>Wykres przedstawia prawdopodobieństwo upadku Twojej działalności w kolejnych latach.</p>',
-            position: 'bottom'
-          }
-        ]
-      });
-      intro.onbeforechange(function(targetElement) {
-        switch (targetElement.id){
-          case "year-slider":
-            $('#main').attr('style','transform: translateY(-33%) !important; transition: all 0.7s ease 0s important!;');
-            break;
-          case "pkd-tree":
-            $('#main').attr('style','transform: translateY(-33%) !important; transition: all 0.7s ease 0s important!;');
-            $('.introjs-arrow').attr('style','opacity: 0 !important;');
-            break;
-          case "prediction-input":
-            $('#main').attr('style','transform: translateY(-66%) !important; transition: all 0.7s ease 0s important!;');
-            $('.introjs-arrow').attr('style','opacity: 0 !important;');
-            break;
-          case "pred-output":
-            $('#main').attr('style','transform: translateY(-66%) !important; transition: all 0.7s ease 0s important!;');
-            $('.introjs-arrow').attr('style','opacity: 0 !important;');
-            break;
-          default:
-            console.log('default')
-            $('.introjs-arrow').css({opacity: 1});
-        } 
-      });
-      intro.start();
-  } 
+        position: 'bottom'
+      }
+    ]
+  });
+  intro.onbeforechange(function (targetElement) {
+    switch (targetElement.id) {
+      case "year-slider":
+        $('#main').find("#map-section").prependTo('#main');
+        break;
+      case "pkd-tree":
+        $('#main').find("#map-section").prependTo('#main');
+        $('.introjs-arrow').attr('style', 'opacity: 0 !important;');
+        break;
+      case "prediction-input":
+        $('#main').find("#prediction-section").prependTo('#main');
+        $('.introjs-arrow').attr('style', 'opacity: 0 !important;');
+        break;
+      case "pred-output":
+        $('#main').find("#prediction-section").prependTo('#main');
+        $('.introjs-arrow').attr('style', 'opacity: 0 !important;');
+        break;
+      default:
+        $('.introjs-arrow').css({ opacity: 1 });
+    }
+  });
+  intro.onexit(function () {
+    $('#main').find("#prediction-section").prependTo('#main');
+    $('#main').find("#map-section").prependTo('#main');
+    $('#main').find("#title-section").prependTo('#main');
+  })
+  intro.start();
+  await new Promise(r => setTimeout(r, 1000));
+  intro.nextStep().previousStep();
+}
 
 function openTab(evt, cityName) {
   var i, tabcontent, tablinks;

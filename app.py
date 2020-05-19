@@ -79,7 +79,6 @@ app.layout = html.Div(
             children=[
                 html.Section(
                     id='title-section',
-                    style={'opacity': 0},
                     children=html.Div(
                       className='screen-height',
                         children=[
