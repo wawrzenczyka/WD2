@@ -204,7 +204,7 @@ app.layout = html.Div(
                                                             className='fill-height',
                                                             config={
                                                                 'displayModeBar': False,
-                                                                'scrollZoom': False
+                                                                'scrollZoom': True
                                                             },
                                                         ),
                                                         html.Div(id="output")

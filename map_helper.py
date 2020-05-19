@@ -94,7 +94,7 @@ def build_map(
                 lon=19.42
             ),
             pitch=0,
-            zoom=5.1
+            zoom=4.5
         ),
         clickmode='event+select'
     )
