@@ -74,3 +74,15 @@
   padding: 5vh 0 5vh 0;
   font-weight: bold;
 }
+
+.btn-primary {
+  color: #fff;
+  background-color: #5c7fba !important;
+  border-color: #5f6690 !important;
+}
+
+.btn-primary:hover {
+  color: #fff;
+  background-color: #5f6690 !important;
+  border-color: #00008b !important;
+}
