@@ -203,8 +203,8 @@ app.layout = html.Div(
                                                             id='map',
                                                             className='fill-height',
                                                             config={
-                                                                'displayModeBar': False,
-                                                                'scrollZoom': True
+                                                                'modeBarButtonsToRemove': ['select2d', 'lasso2d'],
+                                                                'scrollZoom': False
                                                             },
                                                         ),
                                                         html.Div(id="output")
