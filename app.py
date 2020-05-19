@@ -72,7 +72,7 @@ server = app.server
 # PREDICTION MODEL
 clf = load('model.joblib')
 
-analytics_image_filename = os.path.join(THIS_FOLDER, 'assets', 'Images', 'analytics_image.png') # replace with your own image
+analytics_image_filename = os.path.join(THIS_FOLDER, 'assets', 'Images', 'map_image.PNG') # replace with your own image
 analytics_image = base64.b64encode(open(analytics_image_filename, 'rb').read())
 prediction_image_filename = os.path.join(THIS_FOLDER, 'assets', 'Images', 'prediction_image.png') # replace with your own image
 prediction_image = base64.b64encode(open(prediction_image_filename, 'rb').read())
@@ -90,7 +90,7 @@ app.layout = html.Div(
                         style = {'align-items': 'center', 'display': 'flex', 'flex-direction': 'column', 'justify-content': 'center'},
                         children=[
                             html.H1("Jednoosobowe działalności gospodarcze"),
-                            html.H2("Szczegółowa analiza rynku w latach 2011 - 2020"),
+                            html.H2("Szczegółowa analiza rynku w latach 2011 - 2020", style = {'margin-bottom': '20px'}),
                             html.Div([
                                 html.Div("9 ", style = {'font-size': 60}),
                                 html.Div("", style = {'width': '10px'}),
@@ -124,6 +124,8 @@ app.layout = html.Div(
                                         height=250)
                                     ]),
                                     html.Div("Jakie są Twoje szanse na sukces?", style = {'font-size': 18}),
+                                    html.Div("", style = {'font-size': 18}),
+                                    html.Div("", style = {'font-size': 18}),
                                     dcc.Link("Sprawdź", href = '#2', style = {'font-size': 18}, id = 'prediction-button'),                                    
                                 ], style = {'align-items': 'center', 'display': 'flex', 'flex-direction': 'column', 'justify-content': 'center', 'align-self': 'flex-start'}),
                             ], style = {'align-items': 'center', 'display': 'flex', 'flex-direction': 'row', 'justify-content': 'center', 
