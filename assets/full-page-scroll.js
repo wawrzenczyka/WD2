@@ -113,6 +113,8 @@
 			document.addEventListener('touchstart', this.touchStart, false);
 			document.addEventListener('touchend', this.touchEnd, false);
 			window.addEventListener("hashchange", this.hashChange, false);
+			document.getElementById("analysis-button").addEventListener("click", this.hashChangeTo1, false);
+			document.getElementById("prediction-button").addEventListener("click", this.hashChangeTo2, false);
 
 			/**
 			 * Enable scroll if decive don't have touch support
@@ -186,6 +188,18 @@
 					}
 				}
 			}
+		};
+
+		this.hashChangeTo1 = function (event) {
+			var anchor = 1;
+			_self.defaults.currentPosition = anchor;
+			_self.animateScroll();
+		};
+
+		this.hashChangeTo2 = function (event) {
+			var anchor = 2;
+			_self.defaults.currentPosition = anchor;
+			_self.animateScroll();
 		};
 
 		this.removeEvents = function () {

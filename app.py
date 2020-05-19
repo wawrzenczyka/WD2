@@ -13,6 +13,7 @@ import event_timeline
 import os
 from joblib import load
 import visdcc
+import base64
 
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
@@ -63,13 +64,18 @@ pkd_fig = build_pkd_treemap()
 
 app = dash.Dash(__name__, external_stylesheets=[
     dbc.themes.BOOTSTRAP,
-    './styles.css'
+    './styles.css',
 ], external_scripts=external_scripts)
 
 server = app.server
 
 # PREDICTION MODEL
 clf = load('model.joblib')
+
+analytics_image_filename = os.path.join(THIS_FOLDER, 'assets', 'Images', 'map_image.PNG') # replace with your own image
+analytics_image = base64.b64encode(open(analytics_image_filename, 'rb').read())
+prediction_image_filename = os.path.join(THIS_FOLDER, 'assets', 'Images', 'prediction_image.png') # replace with your own image
+prediction_image = base64.b64encode(open(prediction_image_filename, 'rb').read())
 
 app.layout = html.Div(
     children=[
@@ -80,10 +86,50 @@ app.layout = html.Div(
                 html.Section(
                     id='title-section',
                     children=html.Div(
-                      className='screen-height',
+                        className='screen-height',
+                        style = {'align-items': 'center', 'display': 'flex', 'flex-direction': 'column', 'justify-content': 'center'},
                         children=[
-                            # TUTUAJ WSTAWIC STRONE TYTULOWA
-                            html.Div("TITLE PAGE")
+                            html.H1("Jednoosobowe działalności gospodarcze"),
+                            html.H2("Szczegółowa analiza rynku w latach 2011 - 2020", style = {'margin-bottom': '20px'}),
+                            html.Div([
+                                html.Div("9 ", style = {'font-size': 60}),
+                                html.Div("", style = {'width': '10px'}),
+                                html.Div("lat", style = {'font-size': 25}),
+                                html.Div("", style = {'width': '50px'}),
+                                html.Div("280 000 ", style = {'font-size': 60}),
+                                html.Div("", style = {'width': '10px'}),
+                                html.Div("firm", style = {'font-size': 25}),
+                                html.Div("", style = {'width': '50px'}),
+                                html.Div("5 ", style = {'font-size': 60}),
+                                html.Div("", style = {'width': '10px'}),
+                                html.Div("wydarzeń", style = {'font-size': 25}),
+                            ], style = {'align-items': 'center', 'display': 'flex', 'flex-direction': 'row', 'justify-content': 'center'}),
+                            html.Div([
+                                html.Div([
+                                    html.H4("Przekrój przestrzenny oraz gospodarczy działalności"),
+                                    html.Div([
+                                        html.Img(src='data:image/png;base64,{}'.format(analytics_image.decode()),
+                                        height=250)
+                                    ]),
+                                    html.Div("W jakim regionie firmy przetrwały najdłużej?", style = {'font-size': 18}),
+                                    html.Div("Które rodzaje działalności mają nawiększe szanse na sukces?", style = {'font-size': 18}),
+                                    html.Div("Kiedy najczęściej upadają firmy?", style = {'font-size': 18}),
+                                    dcc.Link("Sprawdź", href = '#1', style = {'font-size': 18}, id = 'analysis-button'),
+                                ], style = {'align-items': 'center', 'display': 'flex', 'flex-direction': 'column', 'justify-content': 'center'}),
+                                html.Div("", style = {'width': '100px'}),
+                                html.Div([
+                                    html.H4("Predykcja życia firmy"),
+                                    html.Div([
+                                        html.Img(src='data:image/png;base64,{}'.format(prediction_image.decode()),
+                                        height=250)
+                                    ]),
+                                    html.Div("Jakie są Twoje szanse na sukces?", style = {'font-size': 18}),
+                                    html.Div("", style = {'font-size': 18}),
+                                    html.Div("", style = {'font-size': 18}),
+                                    dcc.Link("Sprawdź", href = '#2', style = {'font-size': 18}, id = 'prediction-button'),                                    
+                                ], style = {'align-items': 'center', 'display': 'flex', 'flex-direction': 'column', 'justify-content': 'center', 'align-self': 'flex-start'}),
+                            ], style = {'align-items': 'center', 'display': 'flex', 'flex-direction': 'row', 'justify-content': 'center', 
+                                        'padding-top': '50px'}),
                         ]
                     )
                 ),
@@ -363,7 +409,6 @@ app.layout = html.Div(
                       ),
     ]
 )
-
 
 @app.callback(
     Output('map', 'figure'),
