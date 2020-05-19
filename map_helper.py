@@ -16,8 +16,7 @@ voivodes_by_year = pd.read_csv(os.path.join(THIS_FOLDER, 'data', 'voivoides_by_y
 def build_map(
         year,
         map_type,
-        selceted_voivodeships,
-        zoom
+        selceted_voivodeships
 ):
     global wojewodztwa_geo
     global voivodes_by_year
@@ -95,7 +94,7 @@ def build_map(
                 lon=19.42
             ),
             pitch=0,
-            zoom=zoom
+            zoom=5.1
         ),
         clickmode='event+select'
     )
