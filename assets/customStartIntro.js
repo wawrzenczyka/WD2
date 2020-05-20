@@ -67,7 +67,8 @@ async function customStartIntro() {
                 <p>Aby <b>zaznaczyć</b> interesujące nas województwo należy w nie kliknąć <u>lewym przyciskiem myszy</u>.</p><hr> \
                 <p>Klikając z <u>shiftem</u> można zaznaczyć kilka województw jednocześnie.</p><hr> \
                 <p>Aby <b>wyłączyć zaznaczenie</b> należy ponownie kliknąć w zaznaczone województwo <u>lewym przyciskiem myszy</u>.<br> \
-                Jeżeli zaznaczone było więcej niż jedno województwo, należy kliknąć dwukrotnie.</p> \
+                Jeżeli zaznaczone było więcej niż jedno województwo, należy kliknąć dwukrotnie.</p><hr> \
+                <p>Mapę można <b>przybliżać i oddalać</b> korzystając z przycisków <u>Zoom in</u> i <u>Zoom out</u> w prawym górnym rogu.</p> \
               </div>\
               <div id="data" class="tabcontent">\
                 <p>Kartogram przedstawia liczbę aktywnych firm lub odsetek upadłych (w zależności od wybranej powyżej opcji), w podziale na województwa. \
