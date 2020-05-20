@@ -395,12 +395,11 @@ app.layout = html.Div(
                                             }),
                                             html.Div("", style = {'width': '50px'}),
                                             html.Div(id="prediction-output"),
-                                        ], style = {'width': '400px'}),
+                                        ], id='prediction-value-text', style = {'width': '400px'}),
                                         html.Div([
                                             dcc.Graph(id='bankrupcy_proba-graph')
-                                        ], style = {'flex': 1})
-                                    ],
-                                    style = {'align-items': 'center', 'display': 'flex', 'flex-direction': 'row', 'justify-content': 'center', 'margin-top': '50px'}
+                                        ], id='prediction-graph-div')
+                                    ]
                                 )
                             ]
                         )]
