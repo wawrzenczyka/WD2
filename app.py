@@ -71,9 +71,9 @@ server = app.server
 # PREDICTION MODEL
 clf = load('model.joblib')
 
-analytics_image_filename = os.path.join(THIS_FOLDER, 'assets', 'Images', 'map_image.PNG') # replace with your own image
+analytics_image_filename = os.path.join(THIS_FOLDER, 'assets', 'Images', 'map_image.PNG')
 analytics_image = base64.b64encode(open(analytics_image_filename, 'rb').read())
-prediction_image_filename = os.path.join(THIS_FOLDER, 'assets', 'Images', 'prediction_image.png') # replace with your own image
+prediction_image_filename = os.path.join(THIS_FOLDER, 'assets', 'Images', 'prediction_image_v3.png')
 prediction_image = base64.b64encode(open(prediction_image_filename, 'rb').read())
 
 app.layout = html.Div(
@@ -113,7 +113,13 @@ app.layout = html.Div(
                                     html.Div("W jakim regionie firmy przetrwały najdłużej?", style = {'font-size': 18}),
                                     html.Div("Które rodzaje działalności mają nawiększe szanse na sukces?", style = {'font-size': 18}),
                                     html.Div("Kiedy najczęściej upadają firmy?", style = {'font-size': 18}),
-                                    dcc.Link("Sprawdź", href = '#1', style = {'font-size': 18}, id = 'analysis-button'),
+                                    dbc.Button(
+                                        id = 'analysis-button',
+                                        href = '#1',
+                                        children = "Sprawdź",
+                                        color = 'primary',
+                                        style = {'margin-top': '10px'}
+                                    )
                                 ], style = {'align-items': 'center', 'display': 'flex', 'flex-direction': 'column', 'justify-content': 'center'}),
                                 html.Div("", style = {'width': '100px'}),
                                 html.Div([
@@ -125,7 +131,13 @@ app.layout = html.Div(
                                     html.Div("Jakie są Twoje szanse na sukces?", style = {'font-size': 18}),
                                     html.Div("", style = {'font-size': 18}),
                                     html.Div("", style = {'font-size': 18}),
-                                    dcc.Link("Sprawdź", href = '#2', style = {'font-size': 18}, id = 'prediction-button'),                                    
+                                    dbc.Button(
+                                        id = 'prediction-button',
+                                        href = '#2',
+                                        children = "Sprawdź",
+                                        color = 'primary',
+                                        style = {'margin-top': '10px'}
+                                    )
                                 ], style = {'align-items': 'center', 'display': 'flex', 'flex-direction': 'column', 'justify-content': 'center', 'align-self': 'flex-start'}),
                             ], style = {'align-items': 'center', 'display': 'flex', 'flex-direction': 'row', 'justify-content': 'center', 
                                         'padding-top': '50px'}),
@@ -169,7 +181,7 @@ app.layout = html.Div(
                                                             color='primary'
                                                         )
                                                     ]
-                                                    )
+                                            )
                                         ]
                                     ),
                                     dbc.Row(
